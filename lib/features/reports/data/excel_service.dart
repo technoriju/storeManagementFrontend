@@ -24,19 +24,19 @@ class ExcelService {
 
     // Header
     sheetObject.appendRow([
-      TextCellValue('Product Code'),
-      TextCellValue('Name'),
-      TextCellValue('SKU'),
-      TextCellValue('Description'),
+      'Product Code',
+      'Name',
+      'SKU',
+      'Description',
     ]);
 
     // Data
     for (var product in products) {
       sheetObject.appendRow([
-        TextCellValue(product.productCode),
-        TextCellValue(product.name),
-        TextCellValue(product.sku),
-        TextCellValue(product.description ?? ''),
+        product.productCode,
+        product.name,
+        product.sku,
+        product.description ?? '',
       ]);
     }
 
@@ -159,12 +159,12 @@ class ExcelService {
                 ));
               } else {
                 await db.into(db.products).insert(ProductsCompanion.insert(
-                  id: uuid.v4(),
+                  id: Value(uuid.v4()),
                   productCode: code,
                   name: name,
                   sku: sku,
                   description: Value(desc),
-                  taxType: 'GST',
+                  taxType: Value('GST'),
                   baseUnitId: 'default', // Ideally this should be matched with existing units
                 ));
               }

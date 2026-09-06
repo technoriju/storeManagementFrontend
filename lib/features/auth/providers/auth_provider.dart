@@ -52,9 +52,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
         'deviceId': deviceId ?? 'unknown',
       });
 
-      final accessToken = response.data['accessToken'];
-      final refreshToken = response.data['refreshToken'];
-      final user = UserModel.fromJson(response.data['user']);
+      final responseData = response.data['data'] ?? response.data;
+      final accessToken = responseData['accessToken'];
+      final refreshToken = responseData['refreshToken'];
+      final user = UserModel.fromJson(responseData['user']);
 
       await _storage.saveToken(_accessTokenKey, accessToken);
       await _storage.saveToken(_refreshTokenKey, refreshToken);

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/app_database.dart';
@@ -10,13 +11,14 @@ final localInventoryRepositoryProvider = Provider((ref) {
 
 class LocalInventoryRepository {
   final AppDatabase _db;
+  final Uuid _uuid = const Uuid();
 
   LocalInventoryRepository(this._db);
 
   Future<void> importProducts(List<Map<String, dynamic>> productsData) async {
     await _db.transaction(() async {
       for (final row in productsData) {
-        final productId = uuid.v4();
+        final productId = _uuid.v4();
 
         // Ensure Category exists or create it
         String? categoryId;
@@ -27,9 +29,9 @@ class LocalInventoryRepository {
                 ..where((t) => t.name.equals(catName)))
               .getSingleOrNull();
           if (cat == null) {
-            categoryId = uuid.v4();
+            categoryId = _uuid.v4();
             await _db.into(_db.categories).insert(
-                CategoriesCompanion.insert(id: categoryId, name: catName));
+                CategoriesCompanion.insert(id: Value(categoryId), name: catName));
           } else {
             categoryId = cat.id;
           }
@@ -44,10 +46,10 @@ class LocalInventoryRepository {
                 ..where((t) => t.name.equals(subCatName)))
               .getSingleOrNull();
           if (subCat == null) {
-            subCategoryId = uuid.v4();
+            subCategoryId = _uuid.v4();
             await _db.into(_db.subCategories).insert(
                 SubCategoriesCompanion.insert(
-                    id: subCategoryId,
+                    id: Value(subCategoryId),
                     categoryId: categoryId ?? '',
                     name: subCatName));
           } else {
@@ -62,10 +64,10 @@ class LocalInventoryRepository {
                 ..where((t) => t.name.equals(brandName)))
               .getSingleOrNull();
           if (brand == null) {
-            brandId = uuid.v4();
+            brandId = _uuid.v4();
             await _db
                 .into(_db.brands)
-                .insert(BrandsCompanion.insert(id: brandId, name: brandName));
+                .insert(BrandsCompanion.insert(id: Value(brandId), name: brandName));
           } else {
             brandId = brand.id;
           }
@@ -76,13 +78,13 @@ class LocalInventoryRepository {
         final unit = await (_db.select(_db.units)
               ..where((t) => t.name.equals(unitName)))
             .getSingleOrNull();
-        String unitId = unit?.id ?? uuid.v4();
+        String unitId = unit?.id ?? _uuid.v4();
         if (unit == null) {
           await _db.into(_db.units).insert(UnitsCompanion.insert(
-              id: unitId, name: unitName, shortName: unitName));
+              id: Value(unitId), name: unitName, shortName: unitName));
         }
 
-        final productCode = row['Product Code']?.toString() ?? uuid.v4();
+        final productCode = row['Product Code']?.toString() ?? _uuid.v4();
 
         final existingProduct = await (_db.select(_db.products)
               ..where((t) => t.productCode.equals(productCode)))
@@ -101,7 +103,7 @@ class LocalInventoryRepository {
         }
 
         final productCompanion = ProductsCompanion.insert(
-          id: productId,
+          id: Value(productId),
           name: row['Product Name'].toString(),
           productCode: productCode,
           sku: skuStr,
@@ -134,7 +136,7 @@ class LocalInventoryRepository {
           if (priceStr != null && double.tryParse(priceStr) != null) {
             await _db.into(_db.productPrices).insert(
                 ProductPricesCompanion.insert(
-                    id: uuid.v4(),
+                    id: Value(_uuid.v4()),
                     productId: productId,
                     productUnitId:
                         unitId, // Base unit for now, as we don't have separate unit resolution here yet
@@ -190,11 +192,11 @@ class LocalInventoryRepository {
     required String reason,
   }) async {
     await _db.transaction(() async {
-      final adjId = uuid.v4();
+      final adjId = _uuid.v4();
 
       // Stock Transaction
       final stockTx = StockTransactionsCompanion.insert(
-        id: adjId,
+        id: Value(adjId),
         productId: productId,
         warehouseId: warehouseId,
         transactionType: 'ADJUSTMENT',
@@ -214,7 +216,16 @@ class LocalInventoryRepository {
             entityType: 'STOCK_ADJUSTMENT',
             entityId: adjId,
             operation: 'CREATE',
-            payload: jsonEncode(stockTx.toJson()),
+            payload: jsonEncode({
+              'id': adjId,
+              'productId': productId,
+              'warehouseId': warehouseId,
+              'transactionType': 'ADJUSTMENT',
+              'referenceId': adjId,
+              'unitId': unitId,
+              'unitQuantity': adjustedQty,
+              'baseQuantity': baseQty,
+            }),
             deviceId: 'local',
           ));
     });
@@ -229,11 +240,13 @@ class LocalInventoryRepository {
     required double baseQty,
   }) async {
     await _db.transaction(() async {
-      final transferId = uuid.v4();
+      final transferId = _uuid.v4();
+      final outId = _uuid.v4();
+      final inId = _uuid.v4();
 
       // OUT from source
       final txOut = StockTransactionsCompanion.insert(
-        id: uuid.v4(),
+        id: Value(outId),
         productId: productId,
         warehouseId: fromWarehouseId,
         transactionType: 'TRANSFER_OUT',
@@ -247,7 +260,7 @@ class LocalInventoryRepository {
 
       // IN to destination
       final txIn = StockTransactionsCompanion.insert(
-        id: uuid.v4(),
+        id: Value(inId),
         productId: productId,
         warehouseId: toWarehouseId,
         transactionType: 'TRANSFER_IN',
@@ -264,7 +277,28 @@ class LocalInventoryRepository {
             entityType: 'STOCK_TRANSFER',
             entityId: transferId,
             operation: 'CREATE',
-            payload: jsonEncode({'out': txOut.toJson(), 'in': txIn.toJson()}),
+            payload: jsonEncode({
+              'out': {
+                'id': outId,
+                'productId': productId,
+                'warehouseId': fromWarehouseId,
+                'transactionType': 'TRANSFER_OUT',
+                'referenceId': transferId,
+                'unitId': unitId,
+                'unitQuantity': -qty,
+                'baseQuantity': -baseQty,
+              },
+              'in': {
+                'id': inId,
+                'productId': productId,
+                'warehouseId': toWarehouseId,
+                'transactionType': 'TRANSFER_IN',
+                'referenceId': transferId,
+                'unitId': unitId,
+                'unitQuantity': qty,
+                'baseQuantity': baseQty,
+              }
+            }),
             deviceId: 'local',
           ));
     });
@@ -284,7 +318,7 @@ class LocalInventoryRepository {
           ));
     } else {
       await _db.into(_db.stockBalances).insert(StockBalancesCompanion.insert(
-            id: uuid.v4(),
+            id: Value(_uuid.v4()),
             productId: productId,
             warehouseId: warehouseId,
             quantity: baseQtyChange,

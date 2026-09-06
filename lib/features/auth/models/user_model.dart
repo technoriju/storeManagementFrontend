@@ -12,10 +12,17 @@ class UserModel {
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    List<String> roleList = [];
+    if (json['roles'] != null) {
+      roleList = List<String>.from(json['roles']);
+    } else if (json['role'] != null) {
+      roleList = [json['role'].toString()];
+    }
+    
     return UserModel(
       id: json['id'] ?? '',
       username: json['username'] ?? '',
-      roles: List<String>.from(json['roles'] ?? []),
+      roles: roleList,
       permissions: List<String>.from(json['permissions'] ?? []),
     );
   }

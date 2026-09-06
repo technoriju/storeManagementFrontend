@@ -17,7 +17,7 @@ class ApiClient {
   ApiClient({
     required this.storage,
     required this.ref,
-    String baseUrl = 'https://api.example.com',
+    String baseUrl = 'http://localhost:3000/api/v1',
   }) {
     _dio = Dio(
       BaseOptions(
@@ -92,8 +92,9 @@ class _AuthInterceptor extends Interceptor {
             'refreshToken': refreshToken,
           });
 
-          final newAccessToken = response.data['accessToken'];
-          final newRefreshToken = response.data['refreshToken'];
+          final responseData = response.data['data'] ?? response.data;
+          final newAccessToken = responseData['accessToken'];
+          final newRefreshToken = responseData['refreshToken'];
 
           await storage.saveToken('access_token', newAccessToken);
           await storage.saveToken('refresh_token', newRefreshToken);
