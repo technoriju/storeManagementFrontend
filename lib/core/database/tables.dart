@@ -53,12 +53,14 @@ class TaxRates extends Table with SyncMixin {
 }
 
 @DataClassName('Product')
+@TableIndex(name: 'product_search_idx', columns: {#name, #barcode})
 class Products extends Table with SyncMixin {
   @override
   Set<Column> get primaryKey => {id};
 
   TextColumn get categoryId => text().nullable().references(Categories, #id)();
-  TextColumn get subCategoryId => text().nullable().references(SubCategories, #id)();
+  TextColumn get subCategoryId =>
+      text().nullable().references(SubCategories, #id)();
   TextColumn get brandId => text().nullable().references(Brands, #id)();
   TextColumn get taxRateId => text().nullable().references(TaxRates, #id)();
   TextColumn get baseUnitId => text().references(Units, #id)();
@@ -72,13 +74,18 @@ class Products extends Table with SyncMixin {
   TextColumn get description => text().nullable()();
   TextColumn get hsnCode => text().nullable()();
 
-  TextColumn get taxType => text().withDefault(const Constant('GST'))(); // GST or NON_GST
-  BoolColumn get isPriceInclusive => boolean().withDefault(const Constant(false))();
+  TextColumn get taxType =>
+      text().withDefault(const Constant('GST'))(); // GST or NON_GST
+  BoolColumn get isPriceInclusive =>
+      boolean().withDefault(const Constant(false))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
 
-  BoolColumn get batchTracking => boolean().withDefault(const Constant(false))();
-  BoolColumn get expiryTracking => boolean().withDefault(const Constant(false))();
-  BoolColumn get serialTracking => boolean().withDefault(const Constant(false))();
+  BoolColumn get batchTracking =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get expiryTracking =>
+      boolean().withDefault(const Constant(false))();
+  BoolColumn get serialTracking =>
+      boolean().withDefault(const Constant(false))();
 
   RealColumn get lowStockLevel => real().nullable()();
   RealColumn get reorderLevel => real().nullable()();
@@ -93,9 +100,7 @@ class ProductUnits extends Table with SyncMixin {
   TextColumn get unitId => text().references(Units, #id)();
   RealColumn get conversionFactor => real()();
   @override
-  List<String> get customConstraints => [
-    'UNIQUE(product_id, unit_id)'
-  ];
+  List<String> get customConstraints => ['UNIQUE(product_id, unit_id)'];
 }
 
 @DataClassName('ProductPrice')
@@ -109,9 +114,8 @@ class ProductPrices extends Table with SyncMixin {
   RealColumn get price => real()();
 
   @override
-  List<String> get customConstraints => [
-    'UNIQUE(product_id, product_unit_id, price_type)'
-  ];
+  List<String> get customConstraints =>
+      ['UNIQUE(product_id, product_unit_id, price_type)'];
 }
 
 @DataClassName('SyncQueue')
@@ -126,8 +130,8 @@ class SyncQueues extends Table {
   TextColumn get payload => text()(); // JSON representation of the entity
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   IntColumn get retryCount => integer().withDefault(const Constant(0))();
-  TextColumn get status => text().withDefault(const Constant('PENDING'))(); // PENDING, SYNCING, FAILED, COMPLETED
+  TextColumn get status => text().withDefault(
+      const Constant('PENDING'))(); // PENDING, SYNCING, FAILED, COMPLETED
   TextColumn get lastError => text().nullable()();
   TextColumn get deviceId => text()();
 }
-

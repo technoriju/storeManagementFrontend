@@ -32,7 +32,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               if (_formKey.currentState!.validate()) {
                 // Save logic
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Product saved (queued for offline sync)')),
+                  const SnackBar(
+                      content: Text('Product saved (queued for offline sync)')),
                 );
                 Navigator.of(context).pop();
               }
@@ -175,7 +176,8 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           children: [
             Expanded(
               child: DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Base Unit * (e.g. PCS)'),
+                decoration:
+                    const InputDecoration(labelText: 'Base Unit * (e.g. PCS)'),
                 items: const [
                   DropdownMenuItem(value: 'PCS', child: Text('PCS')),
                   DropdownMenuItem(value: 'KG', child: Text('KG')),
@@ -212,10 +214,12 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           ],
         ),
         const SizedBox(height: 16),
-        const Text('Unit Conversions', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text('Unit Conversions',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         ListTile(
           title: const Text('1 BOX = 24 PCS'),
-          trailing: IconButton(icon: const Icon(Icons.delete), onPressed: () {}),
+          trailing:
+              IconButton(icon: const Icon(Icons.delete), onPressed: () {}),
         ),
         OutlinedButton.icon(
           onPressed: () {},
@@ -249,8 +253,11 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
               child: DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'GST Rate %'),
                 items: const [
-                  DropdownMenuItem(value: '18', child: Text('18% IGST (9% CGST, 9% SGST)')),
-                  DropdownMenuItem(value: '5', child: Text('5% IGST (2.5% CGST, 2.5% SGST)')),
+                  DropdownMenuItem(
+                      value: '18', child: Text('18% IGST (9% CGST, 9% SGST)')),
+                  DropdownMenuItem(
+                      value: '5',
+                      child: Text('5% IGST (2.5% CGST, 2.5% SGST)')),
                 ],
                 onChanged: _taxType == 'GST' ? (val) {} : null,
               ),
@@ -264,21 +271,33 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
           onChanged: (val) {},
         ),
         const Divider(),
-        const Text('Unit specific pricing (Base Unit: PCS)', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text('Unit specific pricing (Base Unit: PCS)',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: TextFormField(decoration: const InputDecoration(labelText: 'Purchase Price'))),
+            Expanded(
+                child: TextFormField(
+                    decoration:
+                        const InputDecoration(labelText: 'Purchase Price'))),
             const SizedBox(width: 8),
-            Expanded(child: TextFormField(decoration: const InputDecoration(labelText: 'Wholesale Price'))),
+            Expanded(
+                child: TextFormField(
+                    decoration:
+                        const InputDecoration(labelText: 'Wholesale Price'))),
           ],
         ),
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(child: TextFormField(decoration: const InputDecoration(labelText: 'Retail Price'))),
+            Expanded(
+                child: TextFormField(
+                    decoration:
+                        const InputDecoration(labelText: 'Retail Price'))),
             const SizedBox(width: 8),
-            Expanded(child: TextFormField(decoration: const InputDecoration(labelText: 'MRP'))),
+            Expanded(
+                child: TextFormField(
+                    decoration: const InputDecoration(labelText: 'MRP'))),
           ],
         ),
       ],

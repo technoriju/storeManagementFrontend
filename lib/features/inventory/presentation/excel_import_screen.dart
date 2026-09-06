@@ -13,7 +13,7 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
   bool _isUploading = false;
   bool _isParsing = false;
   bool _isImporting = false;
-  
+
   List<Map<String, dynamic>> _parsedData = [];
   List<Map<String, dynamic>> _errorRows = [];
 
@@ -21,7 +21,7 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
     setState(() => _isUploading = true);
     // Mock upload and parse
     await Future.delayed(const Duration(seconds: 2));
-    
+
     _parsedData = [
       {
         'Product Code': 'P001',
@@ -36,7 +36,8 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
         'Product Code': 'P002',
         'Product Name': 'Item 2',
         'Category': 'Cat B',
-        'Brand': '', // Error missing brand if required, but let's just make it valid
+        'Brand':
+            '', // Error missing brand if required, but let's just make it valid
         'Base Unit': 'PCS',
         'Purchase Price': 200,
         'Retail Price': 250,
@@ -61,10 +62,12 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
     setState(() => _isImporting = true);
     await Future.delayed(const Duration(seconds: 2));
     setState(() => _isImporting = false);
-    
+
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Successfully imported ${_parsedData.length} products!')),
+        SnackBar(
+            content:
+                Text('Successfully imported ${_parsedData.length} products!')),
       );
       Navigator.of(context).pop();
     }
@@ -79,7 +82,8 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
       body: Stepper(
         type: StepperType.horizontal,
         currentStep: _currentStep,
-        controlsBuilder: (context, details) => const SizedBox.shrink(), // hide default controls
+        controlsBuilder: (context, details) =>
+            const SizedBox.shrink(), // hide default controls
         steps: [
           Step(
             title: const Text('Upload'),
@@ -153,7 +157,8 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
           ),
           const SizedBox(height: 16),
         ],
-        Text('Valid Rows: ${_parsedData.length}', style: const TextStyle(fontWeight: FontWeight.bold)),
+        Text('Valid Rows: ${_parsedData.length}',
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         SizedBox(
           height: 300,
@@ -163,7 +168,8 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
               final row = _parsedData[index];
               return ListTile(
                 title: Text(row['Product Name'] ?? ''),
-                subtitle: Text('Code: ${row['Product Code']} | Price: ${row['Retail Price']}'),
+                subtitle: Text(
+                    'Code: ${row['Product Code']} | Price: ${row['Retail Price']}'),
                 leading: const Icon(Icons.check_circle, color: Colors.green),
               );
             },

@@ -46,25 +46,25 @@ class LocalPurchaseRepository {
 
         // 4. Local stock projection
         final balanceQuery = _db.select(_db.stockBalances)
-          ..where((b) => b.productId.equals(item.productId.value) & b.warehouseId.equals(warehouseId));
-        
+          ..where((b) =>
+              b.productId.equals(item.productId.value) &
+              b.warehouseId.equals(warehouseId));
+
         final existingBalance = await balanceQuery.getSingleOrNull();
         if (existingBalance != null) {
-          await _db.update(_db.stockBalances).replace(
-            existingBalance.copyWith(
-              quantity: existingBalance.quantity + baseQty,
-              updatedAt: DateTime.now(),
-            )
-          );
+          await _db.update(_db.stockBalances).replace(existingBalance.copyWith(
+                quantity: existingBalance.quantity + baseQty,
+                updatedAt: DateTime.now(),
+              ));
         } else {
-          await _db.into(_db.stockBalances).insert(
-            StockBalancesCompanion.insert(
-              id: uuid.v4(),
-              productId: item.productId.value,
-              warehouseId: warehouseId,
-              quantity: baseQty,
-            )
-          );
+          await _db
+              .into(_db.stockBalances)
+              .insert(StockBalancesCompanion.insert(
+                id: uuid.v4(),
+                productId: item.productId.value,
+                warehouseId: warehouseId,
+                quantity: baseQty,
+              ));
         }
       }
 
@@ -73,22 +73,21 @@ class LocalPurchaseRepository {
         'purchase': purchase.toJson(),
         'items': items.map((e) => e.toJson()).toList(),
       };
-      
-      await _db.into(_db.syncQueues).insert(
-        SyncQueuesCompanion.insert(
-          entityType: 'PURCHASE',
-          entityId: pId,
-          operation: 'CREATE',
-          payload: jsonEncode(payload),
-          deviceId: 'local', // Or fetch from config
-        )
-      );
+
+      await _db.into(_db.syncQueues).insert(SyncQueuesCompanion.insert(
+            entityType: 'PURCHASE',
+            entityId: pId,
+            operation: 'CREATE',
+            payload: jsonEncode(payload),
+            deviceId: 'local', // Or fetch from config
+          ));
     });
   }
 
   Future<void> returnPurchase({
     required PurchaseReturnsCompanion purchaseReturn,
-    required List<PurchaseItemsCompanion> returnItems, // Using PurchaseItem companion for the items being returned
+    required List<PurchaseItemsCompanion>
+        returnItems, // Using PurchaseItem companion for the items being returned
     required String warehouseId,
   }) async {
     await _db.transaction(() async {
@@ -116,26 +115,26 @@ class LocalPurchaseRepository {
         await _db.into(_db.stockTransactions).insert(stockTx);
 
         final balanceQuery = _db.select(_db.stockBalances)
-          ..where((b) => b.productId.equals(item.productId.value) & b.warehouseId.equals(warehouseId));
-        
+          ..where((b) =>
+              b.productId.equals(item.productId.value) &
+              b.warehouseId.equals(warehouseId));
+
         final existingBalance = await balanceQuery.getSingleOrNull();
         if (existingBalance != null) {
-          await _db.update(_db.stockBalances).replace(
-            existingBalance.copyWith(
-              quantity: existingBalance.quantity - baseQty,
-              updatedAt: DateTime.now(),
-            )
-          );
+          await _db.update(_db.stockBalances).replace(existingBalance.copyWith(
+                quantity: existingBalance.quantity - baseQty,
+                updatedAt: DateTime.now(),
+              ));
         } else {
           // It's possible stock is negative now, which is allowed in some systems or handled gracefully
-          await _db.into(_db.stockBalances).insert(
-            StockBalancesCompanion.insert(
-              id: uuid.v4(),
-              productId: item.productId.value,
-              warehouseId: warehouseId,
-              quantity: -baseQty,
-            )
-          );
+          await _db
+              .into(_db.stockBalances)
+              .insert(StockBalancesCompanion.insert(
+                id: uuid.v4(),
+                productId: item.productId.value,
+                warehouseId: warehouseId,
+                quantity: -baseQty,
+              ));
         }
       }
 
@@ -143,16 +142,14 @@ class LocalPurchaseRepository {
         'return': purchaseReturn.toJson(),
         'items': returnItems.map((e) => e.toJson()).toList(),
       };
-      
-      await _db.into(_db.syncQueues).insert(
-        SyncQueuesCompanion.insert(
-          entityType: 'PURCHASE_RETURN',
-          entityId: prId,
-          operation: 'CREATE',
-          payload: jsonEncode(payload),
-          deviceId: 'local',
-        )
-      );
+
+      await _db.into(_db.syncQueues).insert(SyncQueuesCompanion.insert(
+            entityType: 'PURCHASE_RETURN',
+            entityId: prId,
+            operation: 'CREATE',
+            payload: jsonEncode(payload),
+            deviceId: 'local',
+          ));
     });
   }
 }

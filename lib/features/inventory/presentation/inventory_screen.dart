@@ -92,8 +92,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
                   ),
                 ),
                 items: const [
-                  DropdownMenuItem(value: 'Electronics', child: Text('Electronics')),
-                  DropdownMenuItem(value: 'Groceries', child: Text('Groceries')),
+                  DropdownMenuItem(
+                      value: 'Electronics', child: Text('Electronics')),
+                  DropdownMenuItem(
+                      value: 'Groceries', child: Text('Groceries')),
                 ],
                 onChanged: (val) {},
               ),
@@ -171,7 +173,8 @@ class _InventoryScreenState extends State<InventoryScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('\$${product['price'].toStringAsFixed(2)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text('\$${product['price'].toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
                 Text('Stock: ${product['stock']}'),
               ],
             ),
@@ -204,14 +207,17 @@ class _ProductDataSource extends DataTableSource {
       DataCell(
         Chip(
           label: Text(row['active'] ? 'Active' : 'Inactive'),
-          backgroundColor: row['active'] ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
+          backgroundColor: row['active']
+              ? Colors.green.withOpacity(0.1)
+              : Colors.red.withOpacity(0.1),
         ),
       ),
       DataCell(Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           IconButton(icon: const Icon(Icons.edit, size: 20), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.delete, size: 20), onPressed: () {}),
+          IconButton(
+              icon: const Icon(Icons.delete, size: 20), onPressed: () {}),
         ],
       )),
     ]);

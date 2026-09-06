@@ -22,7 +22,7 @@ class Purchases extends Table with SyncMixin {
   TextColumn get invoiceNumber => text()();
   DateTimeColumn get purchaseDate => dateTime()();
   TextColumn get status => text().withDefault(const Constant('COMPLETED'))();
-  
+
   RealColumn get subTotal => real()();
   RealColumn get taxTotal => real()();
   RealColumn get discountTotal => real()();
@@ -39,7 +39,7 @@ class PurchaseItems extends Table with SyncMixin {
   TextColumn get purchaseId => text().references(Purchases, #id)();
   TextColumn get productId => text().references(Products, #id)();
   TextColumn get productUnitId => text().references(ProductUnits, #id)();
-  
+
   RealColumn get quantity => real()();
   RealColumn get unitPrice => real()();
   RealColumn get discount => real()();

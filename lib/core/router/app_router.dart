@@ -88,21 +88,20 @@ final routerProvider = Provider<GoRouter>((ref) {
             ),
           ),
           GoRoute(
-            path: '/inventory',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: InventoryScreen(),
-            ),
-            routes: [
-              GoRoute(
-                path: 'new',
-                builder: (context, state) => const ProductFormScreen(),
-              ),
-              GoRoute(
-                path: 'import',
-                builder: (context, state) => const ExcelImportScreen(),
-              ),
-            ]
-          ),
+              path: '/inventory',
+              pageBuilder: (context, state) => const NoTransitionPage(
+                    child: InventoryScreen(),
+                  ),
+              routes: [
+                GoRoute(
+                  path: 'new',
+                  builder: (context, state) => const ProductFormScreen(),
+                ),
+                GoRoute(
+                  path: 'import',
+                  builder: (context, state) => const ExcelImportScreen(),
+                ),
+              ]),
         ],
       ),
     ],

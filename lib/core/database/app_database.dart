@@ -7,6 +7,7 @@ import 'tables.dart';
 
 import 'purchase_tables.dart';
 import 'inventory_tables.dart';
+import 'sales_tables.dart';
 
 part 'app_database.g.dart';
 
@@ -47,6 +48,14 @@ class DummyEntries extends Table with SyncMixin {
   Warehouses,
   StockTransactions,
   StockBalances,
+  Customers,
+  CustomerLedgers,
+  PaymentMethods,
+  Payments,
+  Sales,
+  SaleItems,
+  SaleReturns,
+  SaleReturnItems,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(openConnection());

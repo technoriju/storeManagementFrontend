@@ -18,14 +18,15 @@ class LocalInventoryRepository {
   }) async {
     await _db.transaction(() async {
       final adjId = uuid.v4();
-      
+
       // Stock Transaction
       final stockTx = StockTransactionsCompanion.insert(
         id: adjId,
         productId: productId,
         warehouseId: warehouseId,
         transactionType: 'ADJUSTMENT',
-        referenceId: adjId, // Self-reference or link to a separate adjustment table if created
+        referenceId:
+            adjId, // Self-reference or link to a separate adjustment table if created
         unitId: unitId,
         unitQuantity: adjustedQty,
         baseQuantity: baseQty,
@@ -34,17 +35,15 @@ class LocalInventoryRepository {
 
       // Local stock projection
       await _applyStockBalance(productId, warehouseId, baseQty);
-      
+
       // Sync Queue
-      await _db.into(_db.syncQueues).insert(
-        SyncQueuesCompanion.insert(
-          entityType: 'STOCK_ADJUSTMENT',
-          entityId: adjId,
-          operation: 'CREATE',
-          payload: jsonEncode(stockTx.toJson()),
-          deviceId: 'local',
-        )
-      );
+      await _db.into(_db.syncQueues).insert(SyncQueuesCompanion.insert(
+            entityType: 'STOCK_ADJUSTMENT',
+            entityId: adjId,
+            operation: 'CREATE',
+            payload: jsonEncode(stockTx.toJson()),
+            deviceId: 'local',
+          ));
     });
   }
 
@@ -58,7 +57,7 @@ class LocalInventoryRepository {
   }) async {
     await _db.transaction(() async {
       final transferId = uuid.v4();
-      
+
       // OUT from source
       final txOut = StockTransactionsCompanion.insert(
         id: uuid.v4(),
@@ -86,51 +85,51 @@ class LocalInventoryRepository {
       );
       await _db.into(_db.stockTransactions).insert(txIn);
       await _applyStockBalance(productId, toWarehouseId, baseQty);
-      
+
       // Sync Queue
-      await _db.into(_db.syncQueues).insert(
-        SyncQueuesCompanion.insert(
-          entityType: 'STOCK_TRANSFER',
-          entityId: transferId,
-          operation: 'CREATE',
-          payload: jsonEncode({'out': txOut.toJson(), 'in': txIn.toJson()}),
-          deviceId: 'local',
-        )
-      );
+      await _db.into(_db.syncQueues).insert(SyncQueuesCompanion.insert(
+            entityType: 'STOCK_TRANSFER',
+            entityId: transferId,
+            operation: 'CREATE',
+            payload: jsonEncode({'out': txOut.toJson(), 'in': txIn.toJson()}),
+            deviceId: 'local',
+          ));
     });
   }
 
-  Future<void> _applyStockBalance(String productId, String warehouseId, double baseQtyChange) async {
+  Future<void> _applyStockBalance(
+      String productId, String warehouseId, double baseQtyChange) async {
     final query = _db.select(_db.stockBalances)
-      ..where((b) => b.productId.equals(productId) & b.warehouseId.equals(warehouseId));
-    
+      ..where((b) =>
+          b.productId.equals(productId) & b.warehouseId.equals(warehouseId));
+
     final existing = await query.getSingleOrNull();
     if (existing != null) {
-      await _db.update(_db.stockBalances).replace(
-        existing.copyWith(
-          quantity: existing.quantity + baseQtyChange,
-          updatedAt: DateTime.now(),
-        )
-      );
+      await _db.update(_db.stockBalances).replace(existing.copyWith(
+            quantity: existing.quantity + baseQtyChange,
+            updatedAt: DateTime.now(),
+          ));
     } else {
-      await _db.into(_db.stockBalances).insert(
-        StockBalancesCompanion.insert(
-          id: uuid.v4(),
-          productId: productId,
-          warehouseId: warehouseId,
-          quantity: baseQtyChange,
-        )
-      );
+      await _db.into(_db.stockBalances).insert(StockBalancesCompanion.insert(
+            id: uuid.v4(),
+            productId: productId,
+            warehouseId: warehouseId,
+            quantity: baseQtyChange,
+          ));
     }
   }
 
   // Stock Ledger Query Foundation
-  Future<List<StockTransaction>> getStockLedger(String productId, {String? warehouseId}) {
-    final query = _db.select(_db.stockTransactions)..where((t) => t.productId.equals(productId));
+  Future<List<StockTransaction>> getStockLedger(String productId,
+      {String? warehouseId}) {
+    final query = _db.select(_db.stockTransactions)
+      ..where((t) => t.productId.equals(productId));
     if (warehouseId != null) {
       query.where((t) => t.warehouseId.equals(warehouseId));
     }
-    query.orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)]);
+    query.orderBy([
+      (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc)
+    ]);
     return query.get();
   }
 }

@@ -10,7 +10,7 @@ class PurchaseEntryScreen extends StatefulWidget {
 
 class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   String? _selectedSupplier;
   final TextEditingController _invoiceNoController = TextEditingController();
   DateTime _purchaseDate = DateTime.now();
@@ -81,7 +81,8 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
           _buildHeaderDetails(),
           const SizedBox(height: 16),
           const Divider(),
-          const Text('Items', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          const Text('Items',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           _buildMobileItemList(),
           OutlinedButton.icon(
             onPressed: _addItemDialog,
@@ -105,7 +106,8 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
           SizedBox(
             width: 300,
             child: DropdownButtonFormField<String>(
-              decoration: const InputDecoration(labelText: 'Supplier', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                  labelText: 'Supplier', border: OutlineInputBorder()),
               items: const [
                 DropdownMenuItem(value: 'SUP-01', child: Text('Acme Corp')),
               ],
@@ -116,7 +118,8 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
             width: 200,
             child: TextFormField(
               controller: _invoiceNoController,
-              decoration: const InputDecoration(labelText: 'Invoice Number', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                  labelText: 'Invoice Number', border: OutlineInputBorder()),
             ),
           ),
           SizedBox(
@@ -132,7 +135,8 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
                 if (date != null) setState(() => _purchaseDate = date);
               },
               child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Purchase Date', border: OutlineInputBorder()),
+                decoration: const InputDecoration(
+                    labelText: 'Purchase Date', border: OutlineInputBorder()),
                 child: Text('${_purchaseDate.toLocal()}'.split(' ')[0]),
               ),
             ),
@@ -149,7 +153,8 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Purchase Items', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Purchase Items',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ElevatedButton.icon(
               onPressed: _addItemDialog,
               icon: const Icon(Icons.add),
@@ -169,24 +174,24 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
                 DataColumn(label: Text('Total')),
                 DataColumn(label: Text('')),
               ],
-              rows: _items.map((item) => DataRow(
-                cells: [
-                  DataCell(Text(item['productName'])),
-                  DataCell(Text(item['unit'])),
-                  DataCell(Text(item['qty'].toString())),
-                  DataCell(Text(item['price'].toString())),
-                  DataCell(Text(item['total'].toString())),
-                  DataCell(IconButton(
-                    icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () {
-                      setState(() {
-                        _items.remove(item);
-                        _calculateTotals();
-                      });
-                    },
-                  )),
-                ]
-              )).toList(),
+              rows: _items
+                  .map((item) => DataRow(cells: [
+                        DataCell(Text(item['productName'])),
+                        DataCell(Text(item['unit'])),
+                        DataCell(Text(item['qty'].toString())),
+                        DataCell(Text(item['price'].toString())),
+                        DataCell(Text(item['total'].toString())),
+                        DataCell(IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () {
+                            setState(() {
+                              _items.remove(item);
+                              _calculateTotals();
+                            });
+                          },
+                        )),
+                      ]))
+                  .toList(),
             ),
           ),
         ),
@@ -244,7 +249,8 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('Summary', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Summary',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 16),
         _summaryRow('Subtotal', _subTotal),
         _summaryRow('Tax', _taxTotal),
@@ -267,8 +273,14 @@ class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontWeight: isTotal ? FontWeight.bold : FontWeight.normal, fontSize: isTotal ? 18 : 14)),
-          Text('\$${amount.toStringAsFixed(2)}', style: TextStyle(fontWeight: isTotal ? FontWeight.bold : FontWeight.normal, fontSize: isTotal ? 18 : 14)),
+          Text(label,
+              style: TextStyle(
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                  fontSize: isTotal ? 18 : 14)),
+          Text('\$${amount.toStringAsFixed(2)}',
+              style: TextStyle(
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                  fontSize: isTotal ? 18 : 14)),
         ],
       ),
     );

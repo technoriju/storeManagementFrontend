@@ -61,7 +61,8 @@ class ShellScreen extends ConsumerWidget {
       message: text,
       child: IconButton(
         icon: Icon(icon, color: color),
-        onPressed: () => ref.read(syncManagerProvider.notifier).triggerManualSync(),
+        onPressed: () =>
+            ref.read(syncManagerProvider.notifier).triggerManualSync(),
       ),
     );
   }
@@ -138,7 +139,7 @@ class ShellScreen extends ConsumerWidget {
             selectedIcon: Icon(Icons.shopping_cart),
             label: 'Sales',
           ),
-            NavigationDestination(
+          NavigationDestination(
             icon: Icon(Icons.shopping_bag_outlined),
             selectedIcon: Icon(Icons.shopping_bag),
             label: 'Purchases',
