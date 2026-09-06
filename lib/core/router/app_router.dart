@@ -13,6 +13,7 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/models/auth_state.dart';
 
 import '../../features/purchases/presentation/purchase_entry_screen.dart';
+import '../../features/reports/presentation/reports_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey =
@@ -102,6 +103,12 @@ final routerProvider = Provider<GoRouter>((ref) {
                   builder: (context, state) => const ExcelImportScreen(),
                 ),
               ]),
+          GoRoute(
+            path: '/reports',
+            pageBuilder: (context, state) => const NoTransitionPage(
+              child: ReportsScreen(),
+            ),
+          ),
         ],
       ),
     ],

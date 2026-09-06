@@ -9,7 +9,13 @@ import 'purchase_tables.dart';
 import 'inventory_tables.dart';
 import 'sales_tables.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 part 'app_database.g.dart';
+
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  return AppDatabase();
+});
 
 const uuid = Uuid();
 

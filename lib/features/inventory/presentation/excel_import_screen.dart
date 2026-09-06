@@ -1,75 +1,84 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
+import '../application/excel_import_service.dart';
 
-class ExcelImportScreen extends StatefulWidget {
+class ExcelImportScreen extends ConsumerStatefulWidget {
   const ExcelImportScreen({super.key});
 
   @override
-  State<ExcelImportScreen> createState() => _ExcelImportScreenState();
+  ConsumerState<ExcelImportScreen> createState() => _ExcelImportScreenState();
 }
 
-class _ExcelImportScreenState extends State<ExcelImportScreen> {
+class _ExcelImportScreenState extends ConsumerState<ExcelImportScreen> {
   int _currentStep = 0;
   bool _isUploading = false;
-  bool _isParsing = false;
   bool _isImporting = false;
 
   List<Map<String, dynamic>> _parsedData = [];
   List<Map<String, dynamic>> _errorRows = [];
+  String? _selectedFileName;
 
-  void _uploadFile() async {
-    setState(() => _isUploading = true);
-    // Mock upload and parse
-    await Future.delayed(const Duration(seconds: 2));
+  Future<void> _uploadFile() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+    );
 
-    _parsedData = [
-      {
-        'Product Code': 'P001',
-        'Product Name': 'Item 1',
-        'Category': 'Cat A',
-        'Brand': 'Brand A',
-        'Base Unit': 'PCS',
-        'Purchase Price': 100,
-        'Retail Price': 150,
-      },
-      {
-        'Product Code': 'P002',
-        'Product Name': 'Item 2',
-        'Category': 'Cat B',
-        'Brand':
-            '', // Error missing brand if required, but let's just make it valid
-        'Base Unit': 'PCS',
-        'Purchase Price': 200,
-        'Retail Price': 250,
-      }
-    ];
-
-    _errorRows = [
-      {
-        'row': 3,
-        'data': {'Product Code': '', 'Product Name': 'Item 3'},
-        'errors': ['Product Code is missing', 'Base Unit is missing']
-      }
-    ];
+    if (result == null || result.files.single.path == null) return;
 
     setState(() {
-      _isUploading = false;
-      _currentStep = 1;
+      _isUploading = true;
+      _selectedFileName = result.files.single.name;
     });
+
+    try {
+      final service = ref.read(excelImportServiceProvider);
+      final data = await service.parseExcelFile(result.files.single.path!);
+
+      setState(() {
+        _parsedData = data['valid'];
+        _errorRows = data['errors'];
+        _currentStep = 1;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to parse file: $e')),
+        );
+      }
+    } finally {
+      setState(() {
+        _isUploading = false;
+      });
+    }
   }
 
   void _confirmImport() async {
     setState(() => _isImporting = true);
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() => _isImporting = false);
 
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content:
-                Text('Successfully imported ${_parsedData.length} products!')),
-      );
-      Navigator.of(context).pop();
+    try {
+      final service = ref.read(excelImportServiceProvider);
+      await service.importData(_parsedData);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'Successfully imported ${_parsedData.length} products!')),
+        );
+        Navigator.of(context).pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to import: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isImporting = false);
+      }
     }
   }
 
@@ -115,12 +124,11 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
           const Icon(Icons.upload_file, size: 64, color: Colors.grey),
           const SizedBox(height: 16),
           const Text('Upload Product Excel Template (.xlsx)'),
-          const SizedBox(height: 8),
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.download),
-            label: const Text('Download Template'),
-          ),
+          if (_selectedFileName != null) ...[
+            const SizedBox(height: 8),
+            Text('Selected: $_selectedFileName',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
           const SizedBox(height: 24),
           _isUploading
               ? const CircularProgressIndicator()
@@ -156,6 +164,7 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
             ),
           ),
           const SizedBox(height: 16),
+          // Show error details if needed
         ],
         Text('Valid Rows: ${_parsedData.length}',
             style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -167,9 +176,9 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
             itemBuilder: (context, index) {
               final row = _parsedData[index];
               return ListTile(
-                title: Text(row['Product Name'] ?? ''),
+                title: Text(row['Product Name']?.toString() ?? ''),
                 subtitle: Text(
-                    'Code: ${row['Product Code']} | Price: ${row['Retail Price']}'),
+                    'Code: ${row['Product Code']} | Base Unit: ${row['Unit']}'),
                 leading: const Icon(Icons.check_circle, color: Colors.green),
               );
             },
@@ -180,12 +189,19 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
-              onPressed: () => setState(() => _currentStep = 0),
+              onPressed: () => setState(() {
+                _currentStep = 0;
+                _selectedFileName = null;
+                _parsedData.clear();
+                _errorRows.clear();
+              }),
               child: const Text('Re-upload File'),
             ),
             const SizedBox(width: 16),
             FilledButton(
-              onPressed: () => setState(() => _currentStep = 2),
+              onPressed: _parsedData.isEmpty
+                  ? null
+                  : () => setState(() => _currentStep = 2),
               child: const Text('Proceed to Import'),
             ),
           ],
@@ -198,7 +214,7 @@ class _ExcelImportScreenState extends State<ExcelImportScreen> {
     return Center(
       child: Column(
         children: [
-          const Text('Ready to import valid products.'),
+          Text('Ready to import ${_parsedData.length} valid products.'),
           const SizedBox(height: 16),
           _isImporting
               ? const CircularProgressIndicator()

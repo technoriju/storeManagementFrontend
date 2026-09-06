@@ -102,6 +102,10 @@ class ShellScreen extends ConsumerWidget {
                 icon: Icon(Icons.inventory),
                 label: Text('Inventory'),
               ),
+              NavigationRailDestination(
+                icon: Icon(Icons.bar_chart),
+                label: Text('Reports'),
+              ),
             ],
           ),
           const VerticalDivider(thickness: 1, width: 1),
@@ -148,6 +152,11 @@ class ShellScreen extends ConsumerWidget {
             icon: Icon(Icons.inventory_2_outlined),
             selectedIcon: Icon(Icons.inventory),
             label: 'Inventory',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.bar_chart_outlined),
+            selectedIcon: Icon(Icons.bar_chart),
+            label: 'Reports',
           ),
         ],
       ),
@@ -338,6 +347,7 @@ class ShellScreen extends ConsumerWidget {
     if (location.startsWith('/sales')) return 1;
     if (location.startsWith('/purchases')) return 2;
     if (location.startsWith('/inventory')) return 3;
+    if (location.startsWith('/reports')) return 4;
     return 0; // dashboard
   }
 
@@ -354,6 +364,9 @@ class ShellScreen extends ConsumerWidget {
         break;
       case 3:
         context.go('/inventory');
+        break;
+      case 4:
+        context.go('/reports');
         break;
     }
   }
