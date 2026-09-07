@@ -50,7 +50,7 @@ class LocalSalesRepository {
           await (_db.update(_db.stockBalances)
                 ..where((t) => t.id.equals(currentBalance.id)))
               .write(StockBalancesCompanion(
-            quantity: Value(currentBalance.quantity - tx.quantity.value),
+            quantity: Value(currentBalance.quantity - tx.baseQuantity.value),
           ));
         }
       }
@@ -130,7 +130,7 @@ class LocalSalesRepository {
                 ..where((t) => t.id.equals(currentBalance.id)))
               .write(StockBalancesCompanion(
             quantity: Value(currentBalance.quantity +
-                tx.quantity.value), // Adding stock back
+                tx.baseQuantity.value), // Adding stock back
           ));
         }
       }

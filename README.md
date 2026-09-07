@@ -31,3 +31,6 @@ To analyze your Drift database for issues without building:
 flutter pub run drift_dev analyze
 ```
 flutter run -d chrome
+
+
+agy --dangerously-skip-permissions

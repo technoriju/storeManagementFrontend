@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:dio/dio.dart';
 import 'package:drift/drift.dart' as drift;
 
 import '../database/app_database.dart';
@@ -186,7 +185,8 @@ class SyncManagerNotifier extends StateNotifier<SyncStatus> {
         // In a real implementation we parse the payload and insert/replace.
         // We also check local version to handle conflict. Server wins in this phase.
         // Implementation detail omitted for brevity - this demonstrates the architecture.
-        debugPrint('Applying $operation to $entityType: $entityId');
+        debugPrint(
+            'Applying $operation to $entityType: $entityId, v$serverVersion, $payload');
       }
     }
   }

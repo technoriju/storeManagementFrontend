@@ -1,10 +1,7 @@
-import 'dart:typed_data';
-
-import '../../core/utils/tax_engine.dart';
-import '../printing/domain/models.dart';
-import '../printing/domain/printer_service.dart';
-import '../printing/application/template_engine.dart';
-import '../../core/database/app_database.dart'; // assuming Drift DB
+import '../../../core/utils/tax_engine.dart';
+import '../../printing/domain/models.dart';
+import '../../printing/domain/printer_service.dart';
+import '../../printing/application/template_engine.dart';
 
 class BillingService {
   final InvoiceTemplateEngine templateEngine;
@@ -38,14 +35,16 @@ class BillingService {
       final quantity = (raw['quantity'] as num).toDouble();
       final unitPrice = (raw['unitPrice'] as num).toDouble();
       final itemDiscount = (raw['discount'] as num?)?.toDouble() ?? 0.0;
-      final taxRate = isGstInvoice ? ((raw['taxRate'] as num?)?.toDouble() ?? 0.0) : 0.0;
+      final taxRate =
+          isGstInvoice ? ((raw['taxRate'] as num?)?.toDouble() ?? 0.0) : 0.0;
       final hsn = raw['hsn'] as String?;
 
       final grossAmount = (quantity * unitPrice) - itemDiscount;
-      
+
       double taxAmount = 0;
       if (isGstInvoice) {
-        taxAmount = TaxEngine.calculateTax(grossAmount, taxRate, isInclusive: isInclusiveTax);
+        taxAmount = TaxEngine.calculateTax(grossAmount, taxRate,
+            isInclusive: isInclusiveTax);
       }
 
       final total = isInclusiveTax ? grossAmount : grossAmount + taxAmount;
@@ -65,7 +64,8 @@ class BillingService {
       totalTax += taxAmount;
     }
 
-    final totalAmount = isInclusiveTax ? subtotal - discount : subtotal + totalTax - discount;
+    final totalAmount =
+        isInclusiveTax ? subtotal - discount : subtotal + totalTax - discount;
 
     return InvoiceData(
       invoiceNumber: invoiceNumber,
@@ -86,20 +86,27 @@ class BillingService {
   }
 
   /// Print standard invoice (A4, A5)
-  Future<void> printStandardInvoice(InvoiceData invoice, StoreConfig config, {PrintPaperSize paperSize = PrintPaperSize.a4}) async {
-    final pdfBytes = await templateEngine.generatePdf(invoice, config, paperSize);
+  Future<void> printStandardInvoice(InvoiceData invoice, StoreConfig config,
+      {PrintPaperSize paperSize = PrintPaperSize.a4}) async {
+    final pdfBytes =
+        await templateEngine.generatePdf(invoice, config, paperSize);
     await printerService.printPdf(pdfBytes);
   }
 
   /// Print thermal invoice (58mm, 80mm)
-  Future<void> printThermalInvoice(InvoiceData invoice, StoreConfig config, {PrintPaperSize paperSize = PrintPaperSize.mm80}) async {
-    final bytes = await templateEngine.generateEscPos(invoice, config, paperSize);
+  Future<void> printThermalInvoice(InvoiceData invoice, StoreConfig config,
+      {PrintPaperSize paperSize = PrintPaperSize.mm80}) async {
+    final bytes =
+        await templateEngine.generateEscPos(invoice, config, paperSize);
     await printerService.printEscPos(bytes);
   }
 
   /// Preview Invoice PDF
-  Future<void> previewInvoice(InvoiceData invoice, StoreConfig config, {PrintPaperSize paperSize = PrintPaperSize.a4}) async {
-    final pdfBytes = await templateEngine.generatePdf(invoice, config, paperSize);
-    await printerService.showPrintPreview(pdfBytes, 'Invoice_${invoice.invoiceNumber}');
+  Future<void> previewInvoice(InvoiceData invoice, StoreConfig config,
+      {PrintPaperSize paperSize = PrintPaperSize.a4}) async {
+    final pdfBytes =
+        await templateEngine.generatePdf(invoice, config, paperSize);
+    await printerService.showPrintPreview(
+        pdfBytes, 'Invoice_${invoice.invoiceNumber}');
   }
 }

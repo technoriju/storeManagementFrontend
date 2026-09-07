@@ -37,11 +37,11 @@ class InvoiceData {
   final double discount;
   final double taxAmount;
   final double totalAmount;
-  
+
   // Tax breakdown (from tax engine)
   final bool isGstInvoice;
   final bool isInclusiveTax;
-  
+
   final List<PaymentDetailData> payments;
 
   const InvoiceData({

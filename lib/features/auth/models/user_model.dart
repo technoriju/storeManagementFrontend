@@ -18,7 +18,7 @@ class UserModel {
     } else if (json['role'] != null) {
       roleList = [json['role'].toString()];
     }
-    
+
     return UserModel(
       id: json['id'] ?? '',
       username: json['username'] ?? '',

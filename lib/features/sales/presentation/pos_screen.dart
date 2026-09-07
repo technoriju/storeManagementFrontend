@@ -6,18 +6,17 @@ import 'package:frontend/features/sales/infrastructure/local_sales_repository.da
 class PosScreen extends StatefulWidget {
   final LocalSalesRepository repository;
 
-  const PosScreen({Key? key, required this.repository}) : super(key: key);
+  const PosScreen({super.key, required this.repository});
 
   @override
-  _PosScreenState createState() => _PosScreenState();
+  State<PosScreen> createState() => _PosScreenState();
 }
 
 class _PosScreenState extends State<PosScreen> {
   final FocusNode _barcodeFocusNode = FocusNode();
   final TextEditingController _barcodeController = TextEditingController();
 
-  List<Product> _products = [];
-  List<Product> _cart = [];
+  final List<Product> _cart = [];
   Customer? _selectedCustomer;
 
   @override
@@ -33,23 +32,7 @@ class _PosScreenState extends State<PosScreen> {
     super.dispose();
   }
 
-  void _handleShortcut(LogicalKeyboardKey key) {
-    if (key == LogicalKeyboardKey.f2) {
-      _newSale();
-    } else if (key == LogicalKeyboardKey.f3) {
-      _showProductSearch();
-    } else if (key == LogicalKeyboardKey.f4) {
-      _showCustomerSelection();
-    } else if (key == LogicalKeyboardKey.f5) {
-      setState(() {});
-    } else if (key == LogicalKeyboardKey.f8) {
-      _showPaymentDialog();
-    } else if (key == LogicalKeyboardKey.f12) {
-      _completeSale();
-    } else if (key == LogicalKeyboardKey.escape) {
-      if (Navigator.canPop(context)) Navigator.pop(context);
-    }
-  }
+
 
   void _newSale() {
     setState(() {
@@ -101,14 +84,31 @@ class _PosScreenState extends State<PosScreen> {
       },
       actions: {
         PosIntent: CallbackAction<PosIntent>(onInvoke: (PosIntent intent) {
+          switch (intent.action) {
+            case 'F2':
+              _newSale();
+              break;
+            case 'F3':
+              _showProductSearch();
+              break;
+            case 'F4':
+              _showCustomerSelection();
+              break;
+            case 'F5':
+              setState(() {});
+              break;
+            case 'F8':
+              _showPaymentDialog();
+              break;
+            case 'F12':
+              _completeSale();
+              break;
+            case 'ESC':
+              if (Navigator.canPop(context)) Navigator.pop(context);
+              break;
+          }
           return null;
         }),
-      },
-      onKeyEvent: (FocusNode node, KeyEvent event) {
-        if (event is KeyDownEvent) {
-          _handleShortcut(event.logicalKey);
-        }
-        return KeyEventResult.ignored;
       },
       child: Scaffold(
         appBar: AppBar(

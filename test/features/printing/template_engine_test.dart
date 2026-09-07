@@ -22,7 +22,7 @@ void main() {
       terms: 'Terms and Conditions Apply.',
     );
 
-    final longProductName = 'Super Deluxe Very Long Product Name With Multiple Words Extender Extra';
+    const longProductName = 'Super Deluxe Very Long Product Name With Multiple Words Extender Extra';
 
     gstInvoice = InvoiceData(
       invoiceNumber: 'INV-001',
@@ -30,7 +30,7 @@ void main() {
       customerName: 'John Doe',
       customerPhone: '9876543210',
       items: [
-        InvoiceItemData(
+        const InvoiceItemData(
           name: longProductName,
           quantity: 2,
           unitPrice: 100,
@@ -39,7 +39,7 @@ void main() {
           taxAmount: 34.2, // (200 - 10) * 0.18
           total: 224.2,
         ),
-        InvoiceItemData(
+        const InvoiceItemData(
           name: 'Item 2',
           quantity: 1,
           unitPrice: 50,
@@ -56,7 +56,7 @@ void main() {
       isGstInvoice: true,
       isInclusiveTax: false,
       payments: [
-        PaymentDetailData(method: 'UPI', amount: 276.7, transactionId: 'TXN123'),
+        const PaymentDetailData(method: 'UPI', amount: 276.7, transactionId: 'TXN123'),
       ],
     );
 
@@ -65,7 +65,7 @@ void main() {
       date: DateTime.now(),
       customerName: 'Jane Smith',
       items: [
-        InvoiceItemData(
+        const InvoiceItemData(
           name: 'Item 3',
           quantity: 3,
           unitPrice: 20,
@@ -82,7 +82,7 @@ void main() {
       isGstInvoice: false,
       isInclusiveTax: false,
       payments: [
-        PaymentDetailData(method: 'Cash', amount: 60.0),
+        const PaymentDetailData(method: 'Cash', amount: 60.0),
       ],
     );
   });

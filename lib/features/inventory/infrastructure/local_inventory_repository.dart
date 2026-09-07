@@ -3,7 +3,6 @@ import 'package:uuid/uuid.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/database/app_database.dart';
-import '../../../core/database/tables.dart';
 
 final localInventoryRepositoryProvider = Provider((ref) {
   return LocalInventoryRepository(ref.read(appDatabaseProvider));
@@ -30,8 +29,8 @@ class LocalInventoryRepository {
               .getSingleOrNull();
           if (cat == null) {
             categoryId = _uuid.v4();
-            await _db.into(_db.categories).insert(
-                CategoriesCompanion.insert(id: Value(categoryId), name: catName));
+            await _db.into(_db.categories).insert(CategoriesCompanion.insert(
+                id: Value(categoryId), name: catName));
           } else {
             categoryId = cat.id;
           }
@@ -65,9 +64,8 @@ class LocalInventoryRepository {
               .getSingleOrNull();
           if (brand == null) {
             brandId = _uuid.v4();
-            await _db
-                .into(_db.brands)
-                .insert(BrandsCompanion.insert(id: Value(brandId), name: brandName));
+            await _db.into(_db.brands).insert(
+                BrandsCompanion.insert(id: Value(brandId), name: brandName));
           } else {
             brandId = brand.id;
           }

@@ -9,7 +9,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize DB early if needed
-  final db = AppDatabase();
+  AppDatabase();
 
   runApp(
     const ProviderScope(
@@ -29,7 +29,7 @@ class MainApp extends ConsumerWidget {
       title: 'Billing App',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: ThemeMode.dark,
       routerConfig: router,
     );
   }

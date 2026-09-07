@@ -9,9 +9,10 @@ import 'template_engine.dart';
 
 class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
   @override
-  Future<Uint8List> generatePdf(InvoiceData invoice, StoreConfig config, PrintPaperSize paperSize) async {
+  Future<Uint8List> generatePdf(
+      InvoiceData invoice, StoreConfig config, PrintPaperSize paperSize) async {
     final pdf = pw.Document();
-    
+
     PdfPageFormat format;
     switch (paperSize) {
       case PrintPaperSize.a4:
@@ -69,12 +70,14 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
             child: pw.Image(pw.MemoryImage(config.logoBytes!)),
           ),
         pw.SizedBox(height: 5),
-        pw.Text(config.businessName, style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
+        pw.Text(config.businessName,
+            style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold)),
         pw.Text(config.address),
         pw.Text('Phone: ${config.phone}'),
         if (config.gstin.isNotEmpty) pw.Text('GSTIN: ${config.gstin}'),
         pw.SizedBox(height: 5),
-        pw.Text(config.invoiceHeader, style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
+        pw.Text(config.invoiceHeader,
+            style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold)),
       ],
     );
   }
@@ -84,10 +87,14 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Customer: ${invoice.customerName}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-        if (invoice.customerPhone != null) pw.Text('Phone: ${invoice.customerPhone}'),
-        if (invoice.customerAddress != null) pw.Text('Address: ${invoice.customerAddress}'),
-        if (invoice.customerGstin != null) pw.Text('GSTIN: ${invoice.customerGstin}'),
+        pw.Text('Customer: ${invoice.customerName}',
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        if (invoice.customerPhone != null)
+          pw.Text('Phone: ${invoice.customerPhone}'),
+        if (invoice.customerAddress != null)
+          pw.Text('Address: ${invoice.customerAddress}'),
+        if (invoice.customerGstin != null)
+          pw.Text('GSTIN: ${invoice.customerGstin}'),
       ],
     );
   }
@@ -126,7 +133,7 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
       data: data,
       border: pw.TableBorder.all(),
       headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-      headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
+      headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
       cellHeight: 30,
       cellAlignments: {
         0: pw.Alignment.centerLeft,
@@ -145,10 +152,15 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
         crossAxisAlignment: pw.CrossAxisAlignment.end,
         children: [
           pw.Text('Subtotal: ${invoice.subtotal.toStringAsFixed(2)}'),
-          if (invoice.discount > 0) pw.Text('Discount: ${invoice.discount.toStringAsFixed(2)}'),
-          if (invoice.isGstInvoice) pw.Text('Tax (${invoice.isInclusiveTax ? 'Incl.' : 'Excl.'}): ${invoice.taxAmount.toStringAsFixed(2)}'),
+          if (invoice.discount > 0)
+            pw.Text('Discount: ${invoice.discount.toStringAsFixed(2)}'),
+          if (invoice.isGstInvoice)
+            pw.Text(
+                'Tax (${invoice.isInclusiveTax ? 'Incl.' : 'Excl.'}): ${invoice.taxAmount.toStringAsFixed(2)}'),
           pw.Divider(),
-          pw.Text('Total: ${invoice.totalAmount.toStringAsFixed(2)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16)),
+          pw.Text('Total: ${invoice.totalAmount.toStringAsFixed(2)}',
+              style:
+                  pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16)),
         ],
       ),
     );
@@ -159,8 +171,10 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        pw.Text('Payments:', style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-        ...invoice.payments.map((p) => pw.Text('${p.method}: ${p.amount.toStringAsFixed(2)}')),
+        pw.Text('Payments:',
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        ...invoice.payments
+            .map((p) => pw.Text('${p.method}: ${p.amount.toStringAsFixed(2)}')),
       ],
     );
   }
@@ -175,9 +189,10 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
             child: pw.Image(pw.MemoryImage(config.signatureBytes!)),
           ),
         pw.SizedBox(height: 10),
-        pw.Text(config.terms, style: pw.TextStyle(fontSize: 10)),
+        pw.Text(config.terms, style: const pw.TextStyle(fontSize: 10)),
         pw.SizedBox(height: 10),
-        pw.Text(config.footer, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+        pw.Text(config.footer,
+            style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
         pw.SizedBox(height: 10),
         pw.BarcodeWidget(
           color: PdfColor.fromHex("#000000"),
@@ -191,84 +206,143 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
   }
 
   @override
-  Future<List<int>> generateEscPos(InvoiceData invoice, StoreConfig config, PrintPaperSize paperSize) async {
+  Future<List<int>> generateEscPos(
+      InvoiceData invoice, StoreConfig config, PrintPaperSize paperSize) async {
     final profile = await CapabilityProfile.load();
-    final paper = paperSize == PrintPaperSize.mm80 ? PaperSize.mm80 : PaperSize.mm58;
+    final paper =
+        paperSize == PrintPaperSize.mm80 ? PaperSize.mm80 : PaperSize.mm58;
     final generator = Generator(paper, profile);
-    
+
     List<int> bytes = [];
 
-    bytes += generator.text(config.businessName, styles: PosStyles(align: PosAlign.center, bold: true, height: PosTextSize.size2, width: PosTextSize.size2));
-    bytes += generator.text(config.address, styles: PosStyles(align: PosAlign.center));
-    bytes += generator.text('Phone: ${config.phone}', styles: PosStyles(align: PosAlign.center));
+    bytes += generator.text(config.businessName,
+        styles: const PosStyles(
+            align: PosAlign.center,
+            bold: true,
+            height: PosTextSize.size2,
+            width: PosTextSize.size2));
+    bytes += generator.text(config.address,
+        styles: const PosStyles(align: PosAlign.center));
+    bytes += generator.text('Phone: ${config.phone}',
+        styles: const PosStyles(align: PosAlign.center));
     if (config.gstin.isNotEmpty) {
-      bytes += generator.text('GSTIN: ${config.gstin}', styles: PosStyles(align: PosAlign.center));
+      bytes += generator.text('GSTIN: ${config.gstin}',
+          styles: const PosStyles(align: PosAlign.center));
     }
-    bytes += generator.text(config.invoiceHeader, styles: PosStyles(align: PosAlign.center, bold: true));
+    bytes += generator.text(config.invoiceHeader,
+        styles: const PosStyles(align: PosAlign.center, bold: true));
     bytes += generator.emptyLines(1);
 
     if (invoice.customerName != null) {
       bytes += generator.text('Customer: ${invoice.customerName}');
-      if (invoice.customerPhone != null) bytes += generator.text('Phone: ${invoice.customerPhone}');
-      if (invoice.customerGstin != null) bytes += generator.text('GSTIN: ${invoice.customerGstin}');
+      if (invoice.customerPhone != null) {
+        bytes += generator.text('Phone: ${invoice.customerPhone}');
+      }
+      if (invoice.customerGstin != null) {
+        bytes += generator.text('GSTIN: ${invoice.customerGstin}');
+      }
       bytes += generator.emptyLines(1);
     }
 
     bytes += generator.text('Invoice #: ${invoice.invoiceNumber}');
-    bytes += generator.text('Date: ${invoice.date.toLocal().toString().split(' ')[0]}');
+    bytes += generator
+        .text('Date: ${invoice.date.toLocal().toString().split(' ')[0]}');
     bytes += generator.emptyLines(1);
 
     // Items table (simple representation for thermal)
     bytes += generator.row([
-      PosColumn(text: 'Item', width: 6, styles: PosStyles(bold: true)),
-      PosColumn(text: 'Qty', width: 2, styles: PosStyles(bold: true, align: PosAlign.right)),
-      PosColumn(text: 'Rate', width: 2, styles: PosStyles(bold: true, align: PosAlign.right)),
-      PosColumn(text: 'Total', width: 2, styles: PosStyles(bold: true, align: PosAlign.right)),
+      PosColumn(text: 'Item', width: 6, styles: const PosStyles(bold: true)),
+      PosColumn(
+          text: 'Qty',
+          width: 2,
+          styles: const PosStyles(bold: true, align: PosAlign.right)),
+      PosColumn(
+          text: 'Rate',
+          width: 2,
+          styles: const PosStyles(bold: true, align: PosAlign.right)),
+      PosColumn(
+          text: 'Total',
+          width: 2,
+          styles: const PosStyles(bold: true, align: PosAlign.right)),
     ]);
     bytes += generator.hr();
 
     for (final item in invoice.items) {
       bytes += generator.row([
         PosColumn(text: item.name, width: 6),
-        PosColumn(text: item.quantity.toStringAsFixed(1), width: 2, styles: PosStyles(align: PosAlign.right)),
-        PosColumn(text: item.unitPrice.toStringAsFixed(2), width: 2, styles: PosStyles(align: PosAlign.right)),
-        PosColumn(text: item.total.toStringAsFixed(2), width: 2, styles: PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: item.quantity.toStringAsFixed(1),
+            width: 2,
+            styles: const PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: item.unitPrice.toStringAsFixed(2),
+            width: 2,
+            styles: const PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: item.total.toStringAsFixed(2),
+            width: 2,
+            styles: const PosStyles(align: PosAlign.right)),
       ]);
     }
     bytes += generator.hr();
 
     bytes += generator.row([
-      PosColumn(text: 'Subtotal:', width: 8, styles: PosStyles(align: PosAlign.right)),
-      PosColumn(text: invoice.subtotal.toStringAsFixed(2), width: 4, styles: PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: 'Subtotal:',
+          width: 8,
+          styles: const PosStyles(align: PosAlign.right)),
+      PosColumn(
+          text: invoice.subtotal.toStringAsFixed(2),
+          width: 4,
+          styles: const PosStyles(align: PosAlign.right)),
     ]);
     if (invoice.discount > 0) {
       bytes += generator.row([
-        PosColumn(text: 'Discount:', width: 8, styles: PosStyles(align: PosAlign.right)),
-        PosColumn(text: invoice.discount.toStringAsFixed(2), width: 4, styles: PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: 'Discount:',
+            width: 8,
+            styles: const PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: invoice.discount.toStringAsFixed(2),
+            width: 4,
+            styles: const PosStyles(align: PosAlign.right)),
       ]);
     }
     if (invoice.isGstInvoice) {
       bytes += generator.row([
-        PosColumn(text: 'Tax:', width: 8, styles: PosStyles(align: PosAlign.right)),
-        PosColumn(text: invoice.taxAmount.toStringAsFixed(2), width: 4, styles: PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: 'Tax:', width: 8, styles: const PosStyles(align: PosAlign.right)),
+        PosColumn(
+            text: invoice.taxAmount.toStringAsFixed(2),
+            width: 4,
+            styles: const PosStyles(align: PosAlign.right)),
       ]);
     }
     bytes += generator.row([
-      PosColumn(text: 'Total:', width: 8, styles: PosStyles(align: PosAlign.right, bold: true)),
-      PosColumn(text: invoice.totalAmount.toStringAsFixed(2), width: 4, styles: PosStyles(align: PosAlign.right, bold: true)),
+      PosColumn(
+          text: 'Total:',
+          width: 8,
+          styles: const PosStyles(align: PosAlign.right, bold: true)),
+      PosColumn(
+          text: invoice.totalAmount.toStringAsFixed(2),
+          width: 4,
+          styles: const PosStyles(align: PosAlign.right, bold: true)),
     ]);
     bytes += generator.emptyLines(1);
 
     for (final p in invoice.payments) {
-      bytes += generator.text('${p.method}: ${p.amount.toStringAsFixed(2)}', styles: PosStyles(align: PosAlign.right));
+      bytes += generator.text('${p.method}: ${p.amount.toStringAsFixed(2)}',
+          styles: const PosStyles(align: PosAlign.right));
     }
 
     bytes += generator.emptyLines(1);
-    bytes += generator.text(config.terms, styles: PosStyles(align: PosAlign.center));
-    bytes += generator.text(config.footer, styles: PosStyles(align: PosAlign.center, bold: true));
-    
+    bytes +=
+        generator.text(config.terms, styles: const PosStyles(align: PosAlign.center));
+    bytes += generator.text(config.footer,
+        styles: const PosStyles(align: PosAlign.center, bold: true));
+
     bytes += generator.emptyLines(1);
-    
+
     // Convert invoice string to barcode bytes (Code128)
     // Note: Esc/Pos plugin might have barcode generation
     try {
@@ -277,7 +351,7 @@ class DefaultInvoiceTemplateEngine implements InvoiceTemplateEngine {
     } catch (e) {
       // In case the barcode format is not supported or needs specific encoding
     }
-    
+
     bytes += generator.feed(2);
     bytes += generator.cut();
 

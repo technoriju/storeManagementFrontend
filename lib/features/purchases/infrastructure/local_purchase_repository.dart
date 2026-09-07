@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
 import '../../../core/database/app_database.dart';
-import '../../../core/database/tables.dart';
 
 class LocalPurchaseRepository {
   final AppDatabase _db;
@@ -33,7 +32,7 @@ class LocalPurchaseRepository {
 
         // 3. Stock Transactions
         final stockTx = StockTransactionsCompanion.insert(
-          id: uuid.v4(),
+          id: Value(uuid.v4()),
           productId: item.productId.value,
           warehouseId: warehouseId,
           transactionType: 'PURCHASE',
@@ -60,7 +59,7 @@ class LocalPurchaseRepository {
           await _db
               .into(_db.stockBalances)
               .insert(StockBalancesCompanion.insert(
-                id: uuid.v4(),
+                id: Value(uuid.v4()),
                 productId: item.productId.value,
                 warehouseId: warehouseId,
                 quantity: baseQty,
@@ -70,8 +69,7 @@ class LocalPurchaseRepository {
 
       // 5. Sync queue entry
       final payload = {
-        'purchase': purchase.toJson(),
-        'items': items.map((e) => e.toJson()).toList(),
+        'purchase_id': pId,
       };
 
       await _db.into(_db.syncQueues).insert(SyncQueuesCompanion.insert(
@@ -103,7 +101,7 @@ class LocalPurchaseRepository {
         final baseQty = item.quantity.value * productUnit.conversionFactor;
 
         final stockTx = StockTransactionsCompanion.insert(
-          id: uuid.v4(),
+          id: Value(uuid.v4()),
           productId: item.productId.value,
           warehouseId: warehouseId,
           transactionType: 'PURCHASE_RETURN',
@@ -130,7 +128,7 @@ class LocalPurchaseRepository {
           await _db
               .into(_db.stockBalances)
               .insert(StockBalancesCompanion.insert(
-                id: uuid.v4(),
+                id: Value(uuid.v4()),
                 productId: item.productId.value,
                 warehouseId: warehouseId,
                 quantity: -baseQty,
@@ -139,8 +137,7 @@ class LocalPurchaseRepository {
       }
 
       final payload = {
-        'return': purchaseReturn.toJson(),
-        'items': returnItems.map((e) => e.toJson()).toList(),
+        'return_id': prId,
       };
 
       await _db.into(_db.syncQueues).insert(SyncQueuesCompanion.insert(

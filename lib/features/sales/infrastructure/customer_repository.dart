@@ -1,4 +1,3 @@
-import 'package:drift/drift.dart';
 import 'package:frontend/core/database/app_database.dart';
 
 class CustomerRepository {

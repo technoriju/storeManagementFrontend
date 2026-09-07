@@ -238,7 +238,7 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
             Expanded(
               child: DropdownButtonFormField<String>(
                 decoration: const InputDecoration(labelText: 'Tax Mode'),
-                value: _taxType,
+                initialValue: _taxType,
                 items: const [
                   DropdownMenuItem(value: 'GST', child: Text('GST')),
                   DropdownMenuItem(value: 'NON_GST', child: Text('NON_GST')),

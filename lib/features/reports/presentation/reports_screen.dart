@@ -5,8 +5,10 @@ import '../data/excel_service.dart';
 import '../../../core/database/app_database.dart';
 
 final dbProvider = Provider<AppDatabase>((ref) => AppDatabase());
-final reportsRepositoryProvider = Provider<ReportsRepository>((ref) => ReportsRepository(ref.watch(dbProvider)));
-final excelServiceProvider = Provider<ExcelService>((ref) => ExcelService(ref.watch(dbProvider)));
+final reportsRepositoryProvider = Provider<ReportsRepository>(
+    (ref) => ReportsRepository(ref.watch(dbProvider)));
+final excelServiceProvider =
+    Provider<ExcelService>((ref) => ExcelService(ref.watch(dbProvider)));
 
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
@@ -22,7 +24,9 @@ class ReportsScreen extends ConsumerWidget {
             tooltip: 'Export Products (Excel)',
             onPressed: () async {
               await ref.read(excelServiceProvider).exportProducts();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Export Excel complete.')));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Export Excel complete.')));
             },
           ),
           IconButton(
@@ -30,7 +34,9 @@ class ReportsScreen extends ConsumerWidget {
             tooltip: 'Export Products (CSV)',
             onPressed: () async {
               await ref.read(excelServiceProvider).exportToCsv();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Export CSV complete.')));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Export CSV complete.')));
             },
           ),
           IconButton(
@@ -38,15 +44,20 @@ class ReportsScreen extends ConsumerWidget {
             tooltip: 'Export Products (PDF)',
             onPressed: () async {
               await ref.read(excelServiceProvider).exportToPdf();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Export PDF complete.')));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Export PDF complete.')));
             },
           ),
           IconButton(
             icon: const Icon(Icons.upload),
             tooltip: 'Import Products (Excel)',
             onPressed: () async {
-              final result = await ref.read(excelServiceProvider).importProducts();
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result)));
+              final result =
+                  await ref.read(excelServiceProvider).importProducts();
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text(result)));
             },
           ),
         ],
@@ -58,32 +69,49 @@ class ReportsScreen extends ConsumerWidget {
             padding: EdgeInsets.only(bottom: 16.0),
             child: Text(
               '⚠️ All reports are generated from local synchronized data and are available offline.',
-              style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+              style:
+                  TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
             ),
           ),
           _buildReportCard(
             context,
             'Daily Sales Report',
             Icons.point_of_sale,
-            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportDetailScreen(reportType: 'Daily Sales'))),
+            () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        const ReportDetailScreen(reportType: 'Daily Sales'))),
           ),
           _buildReportCard(
             context,
             'Top Products',
             Icons.star,
-            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportDetailScreen(reportType: 'Top Products'))),
+            () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        const ReportDetailScreen(reportType: 'Top Products'))),
           ),
           _buildReportCard(
             context,
             'Low Stock Report',
             Icons.warning,
-            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportDetailScreen(reportType: 'Low Stock'))),
+            () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) =>
+                        const ReportDetailScreen(reportType: 'Low Stock'))),
           ),
           _buildReportCard(
             context,
             'Customer Outstanding',
             Icons.people,
-            () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReportDetailScreen(reportType: 'Customer Outstanding'))),
+            () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const ReportDetailScreen(
+                        reportType: 'Customer Outstanding'))),
           ),
           // Additional reports can be added here
         ],
@@ -91,7 +119,8 @@ class ReportsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildReportCard(BuildContext context, String title, IconData icon, VoidCallback onTap) {
+  Widget _buildReportCard(
+      BuildContext context, String title, IconData icon, VoidCallback onTap) {
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
@@ -126,7 +155,9 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() { _isLoading = true; });
+    setState(() {
+      _isLoading = true;
+    });
     final repo = ref.read(reportsRepositoryProvider);
     try {
       switch (widget.reportType) {
@@ -146,7 +177,9 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
     } catch (e) {
       debugPrint(e.toString());
     } finally {
-      setState(() { _isLoading = false; });
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -156,7 +189,8 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
       appBar: AppBar(title: Text(widget.reportType)),
       body: Column(
         children: [
-          if (widget.reportType == 'Daily Sales' || widget.reportType == 'Top Products')
+          if (widget.reportType == 'Daily Sales' ||
+              widget.reportType == 'Top Products')
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -164,13 +198,15 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
                   Expanded(
                     child: TextButton.icon(
                       icon: const Icon(Icons.date_range),
-                      label: Text('${_startDate.toString().split(' ')[0]} to ${_endDate.toString().split(' ')[0]}'),
+                      label: Text(
+                          '${_startDate.toString().split(' ')[0]} to ${_endDate.toString().split(' ')[0]}'),
                       onPressed: () async {
                         final picked = await showDateRangePicker(
                           context: context,
                           firstDate: DateTime(2000),
                           lastDate: DateTime.now(),
-                          initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
+                          initialDateRange:
+                              DateTimeRange(start: _startDate, end: _endDate),
                         );
                         if (picked != null) {
                           setState(() {
@@ -186,10 +222,11 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
               ),
             ),
           Expanded(
-            child: _isLoading 
-                ? const Center(child: CircularProgressIndicator()) 
-                : _data.isEmpty 
-                    ? const Center(child: Text('No data found for this report.'))
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _data.isEmpty
+                    ? const Center(
+                        child: Text('No data found for this report.'))
                     : _buildDataTable(),
           ),
         ],
@@ -199,17 +236,23 @@ class _ReportDetailScreenState extends ConsumerState<ReportDetailScreen> {
 
   Widget _buildDataTable() {
     if (_data.isEmpty) return const SizedBox();
-    
+
     final columns = _data.first.keys.toList();
-    
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: SingleChildScrollView(
         child: DataTable(
-          columns: columns.map((e) => DataColumn(label: Text(e.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.bold)))).toList(),
+          columns: columns
+              .map((e) => DataColumn(
+                  label: Text(e.toUpperCase(),
+                      style: const TextStyle(fontWeight: FontWeight.bold))))
+              .toList(),
           rows: _data.map((row) {
             return DataRow(
-              cells: columns.map((col) => DataCell(Text(row[col]?.toString() ?? ''))).toList(),
+              cells: columns
+                  .map((col) => DataCell(Text(row[col]?.toString() ?? '')))
+                  .toList(),
             );
           }).toList(),
         ),

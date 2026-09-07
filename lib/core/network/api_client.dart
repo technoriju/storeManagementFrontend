@@ -12,7 +12,7 @@ final apiClientProvider = Provider<ApiClient>((ref) {
 class ApiClient {
   late final Dio _dio;
   final SecureStorageService storage;
-  final ProviderRef ref;
+  final Ref ref;
 
   ApiClient({
     required this.storage,
@@ -50,7 +50,7 @@ class _NetworkStatusInterceptor extends Interceptor {
 class _AuthInterceptor extends Interceptor {
   final SecureStorageService storage;
   final Dio dio;
-  final ProviderRef ref;
+  final Ref ref;
 
   bool _isRefreshing = false;
   final List<Map<String, dynamic>> _failedRequests = [];

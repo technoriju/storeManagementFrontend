@@ -11,14 +11,15 @@ class PurchaseEntryScreen extends StatefulWidget {
 class _PurchaseEntryScreenState extends State<PurchaseEntryScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  // ignore: unused_field
   String? _selectedSupplier;
   final TextEditingController _invoiceNoController = TextEditingController();
   DateTime _purchaseDate = DateTime.now();
 
-  List<Map<String, dynamic>> _items = [];
+  final List<Map<String, dynamic>> _items = [];
   double _subTotal = 0;
   double _taxTotal = 0;
-  double _discountTotal = 0;
+  final double _discountTotal = 0;
   double _grandTotal = 0;
 
   @override
