@@ -15,118 +15,111 @@ class DashboardScreen extends StatelessWidget {
           children: [
             const Header(),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppTheme.defaultPadding * 1.5),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Welcome & Date
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(AppTheme.defaultPadding * 1.5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Welcome, Admin", style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text("You have 200+ Orders, Today", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
-                          ],
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Row(
+                        // Welcome & Date
+                        if (constraints.maxWidth > 600)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                              const SizedBox(width: 8),
-                              Text("02/09/2026 - 08/09/2026", style: Theme.of(context).textTheme.bodyMedium),
+                              _buildWelcomeText(context),
+                              _buildDateButton(context),
+                            ],
+                          )
+                        else
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildWelcomeText(context),
+                              const SizedBox(height: 12),
+                              _buildDateButton(context),
                             ],
                           ),
-                        )
-                      ],
-                    ),
-                    const SizedBox(height: AppTheme.defaultPadding * 1.5),
+                        const SizedBox(height: AppTheme.defaultPadding * 1.5),
 
-                    // Alert Banner
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.red.withOpacity(0.05),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.error_outline, color: Colors.red, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
-                                children: const [
-                                  TextSpan(text: "Your Product "),
-                                  TextSpan(text: "Apple Iphone 15 is running Low, ", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                                  TextSpan(text: "already below 5 Pcs., "),
-                                  TextSpan(text: "Add Stock", style: TextStyle(color: Colors.red, decoration: TextDecoration.underline)),
-                                ],
+                        // Alert Banner
+                        _buildAlertBanner(context),
+                        const SizedBox(height: AppTheme.defaultPadding * 1.5),
+
+                        // Primary Stats
+                        _PrimaryStatsGrid(maxWidth: constraints.maxWidth),
+                        const SizedBox(height: AppTheme.defaultPadding),
+
+                        // Secondary Stats
+                        _SecondaryStatsGrid(maxWidth: constraints.maxWidth),
+                        const SizedBox(height: AppTheme.defaultPadding * 1.5),
+
+                        // Charts Row 1
+                        if (constraints.maxWidth > 1000)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                flex: 5,
+                                child: _PlaceholderCard("Sales & Purchase Chart (Bar Chart)"),
                               ),
-                            ),
+                              const SizedBox(width: AppTheme.defaultPadding),
+                              Expanded(
+                                flex: 3,
+                                child: _PlaceholderCard("Overall Information (Radial Chart)"),
+                              ),
+                            ],
+                          )
+                        else
+                          Column(
+                            children: [
+                              _PlaceholderCard("Sales & Purchase Chart (Bar Chart)"),
+                              const SizedBox(height: AppTheme.defaultPadding),
+                              _PlaceholderCard("Overall Information (Radial Chart)"),
+                            ],
                           ),
-                          const Icon(Icons.close, color: Colors.grey, size: 20),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppTheme.defaultPadding * 1.5),
+                        const SizedBox(height: AppTheme.defaultPadding * 1.5),
 
-                    // Primary Stats
-                    Responsive(
-                      mobile: _PrimaryStatsGrid(crossAxisCount: 1, childAspectRatio: 2.5),
-                      tablet: _PrimaryStatsGrid(crossAxisCount: 2, childAspectRatio: 2),
-                      desktop: _PrimaryStatsGrid(crossAxisCount: 4, childAspectRatio: 2.5),
-                    ),
-                    const SizedBox(height: AppTheme.defaultPadding),
-
-                    // Secondary Stats
-                    Responsive(
-                      mobile: _SecondaryStatsGrid(crossAxisCount: 1, childAspectRatio: 2.5),
-                      tablet: _SecondaryStatsGrid(crossAxisCount: 2, childAspectRatio: 2),
-                      desktop: _SecondaryStatsGrid(crossAxisCount: 4, childAspectRatio: 2.2),
-                    ),
-                    const SizedBox(height: AppTheme.defaultPadding * 1.5),
-
-                    // Charts Row 1
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 5,
-                          child: _PlaceholderCard("Sales & Purchase Chart (Bar Chart)"),
-                        ),
-                        if (!Responsive.isMobile(context)) const SizedBox(width: AppTheme.defaultPadding),
-                        if (!Responsive.isMobile(context))
-                          Expanded(
-                            flex: 3,
-                            child: _PlaceholderCard("Overall Information (Radial Chart)"),
+                        // Lists Row
+                        if (constraints.maxWidth > 1100)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: _PlaceholderCard("Top Selling Products")),
+                              const SizedBox(width: AppTheme.defaultPadding),
+                              Expanded(child: _PlaceholderCard("Low Stock Products")),
+                              const SizedBox(width: AppTheme.defaultPadding),
+                              Expanded(child: _PlaceholderCard("Recent Sales")),
+                            ],
+                          )
+                        else if (constraints.maxWidth > 700)
+                           Column(
+                             children: [
+                               Row(
+                                 children: [
+                                   Expanded(child: _PlaceholderCard("Top Selling Products")),
+                                   const SizedBox(width: AppTheme.defaultPadding),
+                                   Expanded(child: _PlaceholderCard("Low Stock Products")),
+                                 ],
+                               ),
+                               const SizedBox(height: AppTheme.defaultPadding),
+                               _PlaceholderCard("Recent Sales"),
+                             ],
+                           )
+                        else
+                          Column(
+                            children: [
+                              _PlaceholderCard("Top Selling Products"),
+                              const SizedBox(height: AppTheme.defaultPadding),
+                              _PlaceholderCard("Low Stock Products"),
+                              const SizedBox(height: AppTheme.defaultPadding),
+                              _PlaceholderCard("Recent Sales"),
+                            ],
                           ),
                       ],
                     ),
-                    const SizedBox(height: AppTheme.defaultPadding * 1.5),
-
-                    // Lists Row
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(child: _PlaceholderCard("Top Selling Products")),
-                        const SizedBox(width: AppTheme.defaultPadding),
-                        Expanded(child: _PlaceholderCard("Low Stock Products")),
-                        const SizedBox(width: AppTheme.defaultPadding),
-                        Expanded(child: _PlaceholderCard("Recent Sales")),
-                      ],
-                    ),
-                  ],
-                ),
+                  );
+                }
               ),
             ),
           ],
@@ -134,57 +127,121 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildWelcomeText(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Welcome, Admin", style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+        const SizedBox(height: 4),
+        Text("You have 200+ Orders, Today", style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
+      ],
+    );
+  }
+
+  Widget _buildDateButton(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+          const SizedBox(width: 8),
+          Text("02/09/2026 - 08/09/2026", style: Theme.of(context).textTheme.bodyMedium),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAlertBanner(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.red.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: RichText(
+              text: TextSpan(
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[700]),
+                children: const [
+                  TextSpan(text: "Your Product "),
+                  TextSpan(text: "Apple Iphone 15 is running Low, ", style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  TextSpan(text: "already below 5 Pcs., "),
+                  TextSpan(text: "Add Stock", style: TextStyle(color: Colors.red, decoration: TextDecoration.underline)),
+                ],
+              ),
+            ),
+          ),
+          const Icon(Icons.close, color: Colors.grey, size: 20),
+        ],
+      ),
+    );
+  }
 }
 
 class _PrimaryStatsGrid extends StatelessWidget {
-  final int crossAxisCount;
-  final double childAspectRatio;
+  final double maxWidth;
 
-  const _PrimaryStatsGrid({required this.crossAxisCount, required this.childAspectRatio});
+  const _PrimaryStatsGrid({required this.maxWidth});
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      childAspectRatio: childAspectRatio,
-      crossAxisSpacing: AppTheme.defaultPadding,
-      mainAxisSpacing: AppTheme.defaultPadding,
+    return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      children: [
-        _PrimaryStatCard(
-          title: "Total Sales",
-          amount: "\$48,988,078",
-          percentage: "+22%",
-          isPositive: true,
-          color: const Color(0xFFFF9F43), // Orange
-          icon: Icons.description_outlined,
-        ),
-        _PrimaryStatCard(
-          title: "Total Sales Return",
-          amount: "\$16,478,145",
-          percentage: "-22%",
-          isPositive: false,
-          color: const Color(0xFF1F385B), // Dark Blue
-          icon: Icons.sync_alt,
-        ),
-        _PrimaryStatCard(
-          title: "Total Purchase",
-          amount: "\$24,145,789",
-          percentage: "+22%",
-          isPositive: true,
-          color: const Color(0xFF28C76F), // Teal/Green
-          icon: Icons.inventory_2_outlined,
-        ),
-        _PrimaryStatCard(
-          title: "Total Purchase Return",
-          amount: "\$18,458,747",
-          percentage: "+22%",
-          isPositive: true,
-          color: const Color(0xFF2E65F3), // Blue
-          icon: Icons.verified_user_outlined,
-        ),
-      ],
+      itemCount: 4,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 400,
+        mainAxisExtent: 130, // Fixed height instead of aspect ratio
+        crossAxisSpacing: AppTheme.defaultPadding,
+        mainAxisSpacing: AppTheme.defaultPadding,
+      ),
+      itemBuilder: (context, index) {
+        final cards = [
+          _PrimaryStatCard(
+            title: "Total Sales",
+            amount: "\$48,988,078",
+            percentage: "+22%",
+            isPositive: true,
+            color: const Color(0xFFFF9F43), // Orange
+            icon: Icons.description_outlined,
+          ),
+          _PrimaryStatCard(
+            title: "Total Sales Return",
+            amount: "\$16,478,145",
+            percentage: "-22%",
+            isPositive: false,
+            color: const Color(0xFF1F385B), // Dark Blue
+            icon: Icons.sync_alt,
+          ),
+          _PrimaryStatCard(
+            title: "Total Purchase",
+            amount: "\$24,145,789",
+            percentage: "+22%",
+            isPositive: true,
+            color: const Color(0xFF28C76F), // Teal/Green
+            icon: Icons.inventory_2_outlined,
+          ),
+          _PrimaryStatCard(
+            title: "Total Purchase Return",
+            amount: "\$18,458,747",
+            percentage: "+22%",
+            isPositive: true,
+            color: const Color(0xFF2E65F3), // Blue
+            icon: Icons.verified_user_outlined,
+          ),
+        ];
+        return cards[index];
+      },
     );
   }
 }
@@ -261,51 +318,56 @@ class _PrimaryStatCard extends StatelessWidget {
 }
 
 class _SecondaryStatsGrid extends StatelessWidget {
-  final int crossAxisCount;
-  final double childAspectRatio;
+  final double maxWidth;
 
-  const _SecondaryStatsGrid({required this.crossAxisCount, required this.childAspectRatio});
+  const _SecondaryStatsGrid({required this.maxWidth});
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: crossAxisCount,
-      childAspectRatio: childAspectRatio,
-      crossAxisSpacing: AppTheme.defaultPadding,
-      mainAxisSpacing: AppTheme.defaultPadding,
+    return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      children: [
-        _SecondaryStatCard(
-          title: "Profit",
-          amount: "\$8,458,798",
-          percentage: "+35%",
-          icon: Icons.layers,
-          iconColor: Colors.teal,
-        ),
-        _SecondaryStatCard(
-          title: "Invoice Due",
-          amount: "\$48,988,78",
-          percentage: "+35%",
-          icon: Icons.pie_chart,
-          iconColor: Colors.teal,
-        ),
-        _SecondaryStatCard(
-          title: "Total Expenses",
-          amount: "\$8,980,097",
-          percentage: "+41%",
-          icon: Icons.donut_large,
-          iconColor: Colors.redAccent,
-        ),
-        _SecondaryStatCard(
-          title: "Total Payment Returns",
-          amount: "\$78,458,798",
-          percentage: "-20%",
-          isPositive: false,
-          icon: Icons.grid_view,
-          iconColor: Colors.deepPurple,
-        ),
-      ],
+      itemCount: 4,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 400,
+        mainAxisExtent: 130, // Fixed height instead of aspect ratio
+        crossAxisSpacing: AppTheme.defaultPadding,
+        mainAxisSpacing: AppTheme.defaultPadding,
+      ),
+      itemBuilder: (context, index) {
+        final cards = [
+          const _SecondaryStatCard(
+            title: "Profit",
+            amount: "\$8,458,798",
+            percentage: "+35%",
+            icon: Icons.layers,
+            iconColor: Colors.teal,
+          ),
+          const _SecondaryStatCard(
+            title: "Invoice Due",
+            amount: "\$48,988,78",
+            percentage: "+35%",
+            icon: Icons.pie_chart,
+            iconColor: Colors.teal,
+          ),
+          const _SecondaryStatCard(
+            title: "Total Expenses",
+            amount: "\$8,980,097",
+            percentage: "+41%",
+            icon: Icons.donut_large,
+            iconColor: Colors.redAccent,
+          ),
+          const _SecondaryStatCard(
+            title: "Total Payment Returns",
+            amount: "\$78,458,798",
+            percentage: "-20%",
+            isPositive: false,
+            icon: Icons.grid_view,
+            iconColor: Colors.deepPurple,
+          ),
+        ];
+        return cards[index];
+      },
     );
   }
 }

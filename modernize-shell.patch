@@ -1,0 +1,825 @@
+diff --git a/lib/features/dashboard/presentation/dashboard_screen.dart b/lib/features/dashboard/presentation/dashboard_screen.dart
+index 754eddb..099899e 100644
+--- a/lib/features/dashboard/presentation/dashboard_screen.dart
++++ b/lib/features/dashboard/presentation/dashboard_screen.dart
+@@ -102,29 +102,52 @@ class DashboardScreen extends StatelessWidget {
+                       children: [
+                         Expanded(
+                           flex: 5,
+-                          child: _PlaceholderCard("Sales & Purchase Chart (Bar Chart)"),
++                          child: _FadeSlideIn(
++                            index: 8,
++                            child: _PlaceholderCard("Sales & Purchase Chart (Bar Chart)"),
++                          ),
+                         ),
+                         if (!Responsive.isMobile(context)) const SizedBox(width: AppTheme.defaultPadding),
+                         if (!Responsive.isMobile(context))
+                           Expanded(
+                             flex: 3,
+-                            child: _PlaceholderCard("Overall Information (Radial Chart)"),
++                            child: _FadeSlideIn(
++                              index: 9,
++                              child: _PlaceholderCard("Overall Information (Radial Chart)"),
++                            ),
+                           ),
+                       ],
+                     ),
+                     const SizedBox(height: AppTheme.defaultPadding * 1.5),
+ 
+-                    // Lists Row
+-                    Row(
+-                      crossAxisAlignment: CrossAxisAlignment.start,
+-                      children: [
+-                        Expanded(child: _PlaceholderCard("Top Selling Products")),
+-                        const SizedBox(width: AppTheme.defaultPadding),
+-                        Expanded(child: _PlaceholderCard("Low Stock Products")),
+-                        const SizedBox(width: AppTheme.defaultPadding),
+-                        Expanded(child: _PlaceholderCard("Recent Sales")),
+-                      ],
+-                    ),
++                    // Lists Row — stacks vertically on mobile so the three
++                    // panels don't get squeezed into unreadable slivers.
++                    Responsive.isMobile(context)
++                        ? Column(
++                            children: const [
++                              _PlaceholderCard("Top Selling Products"),
++                              SizedBox(height: AppTheme.defaultPadding),
++                              _PlaceholderCard("Low Stock Products"),
++                              SizedBox(height: AppTheme.defaultPadding),
++                              _PlaceholderCard("Recent Sales"),
++                            ],
++                          )
++                        : Row(
++                            crossAxisAlignment: CrossAxisAlignment.start,
++                            children: [
++                              Expanded(child: _PlaceholderCard("Top Selling Products")),
++                              const SizedBox(width: AppTheme.defaultPadding),
++                              Expanded(child: _PlaceholderCard("Low Stock Products")),
++                              if (!Responsive.isTablet(context)) ...[
++                                const SizedBox(width: AppTheme.defaultPadding),
++                                Expanded(child: _PlaceholderCard("Recent Sales")),
++                              ],
++                            ],
++                          ),
++                    if (Responsive.isTablet(context)) ...[
++                      const SizedBox(height: AppTheme.defaultPadding),
++                      const _PlaceholderCard("Recent Sales"),
++                    ],
+                   ],
+                 ),
+               ),
+@@ -152,37 +175,49 @@ class _PrimaryStatsGrid extends StatelessWidget {
+       shrinkWrap: true,
+       physics: const NeverScrollableScrollPhysics(),
+       children: [
+-        _PrimaryStatCard(
+-          title: "Total Sales",
+-          amount: "\$48,988,078",
+-          percentage: "+22%",
+-          isPositive: true,
+-          color: const Color(0xFFFF9F43), // Orange
+-          icon: Icons.description_outlined,
++        _FadeSlideIn(
++          index: 0,
++          child: _PrimaryStatCard(
++            title: "Total Sales",
++            amount: "\$48,988,078",
++            percentage: "+22%",
++            isPositive: true,
++            color: const Color(0xFFFF9F43), // Orange
++            icon: Icons.description_outlined,
++          ),
+         ),
+-        _PrimaryStatCard(
+-          title: "Total Sales Return",
+-          amount: "\$16,478,145",
+-          percentage: "-22%",
+-          isPositive: false,
+-          color: const Color(0xFF1F385B), // Dark Blue
+-          icon: Icons.sync_alt,
++        _FadeSlideIn(
++          index: 1,
++          child: _PrimaryStatCard(
++            title: "Total Sales Return",
++            amount: "\$16,478,145",
++            percentage: "-22%",
++            isPositive: false,
++            color: const Color(0xFF1F385B), // Dark Blue
++            icon: Icons.sync_alt,
++          ),
+         ),
+-        _PrimaryStatCard(
+-          title: "Total Purchase",
+-          amount: "\$24,145,789",
+-          percentage: "+22%",
+-          isPositive: true,
+-          color: const Color(0xFF28C76F), // Teal/Green
+-          icon: Icons.inventory_2_outlined,
++        _FadeSlideIn(
++          index: 2,
++          child: _PrimaryStatCard(
++            title: "Total Purchase",
++            amount: "\$24,145,789",
++            percentage: "+22%",
++            isPositive: true,
++            color: const Color(0xFF28C76F), // Teal/Green
++            icon: Icons.inventory_2_outlined,
++          ),
+         ),
+-        _PrimaryStatCard(
+-          title: "Total Purchase Return",
+-          amount: "\$18,458,747",
+-          percentage: "+22%",
+-          isPositive: true,
+-          color: const Color(0xFF2E65F3), // Blue
+-          icon: Icons.verified_user_outlined,
++        _FadeSlideIn(
++          index: 3,
++          child: _PrimaryStatCard(
++            title: "Total Purchase Return",
++            amount: "\$18,458,747",
++            percentage: "+22%",
++            isPositive: true,
++            color: const Color(0xFF2E65F3), // Blue
++            icon: Icons.verified_user_outlined,
++          ),
+         ),
+       ],
+     );
+@@ -276,34 +311,46 @@ class _SecondaryStatsGrid extends StatelessWidget {
+       shrinkWrap: true,
+       physics: const NeverScrollableScrollPhysics(),
+       children: [
+-        _SecondaryStatCard(
+-          title: "Profit",
+-          amount: "\$8,458,798",
+-          percentage: "+35%",
+-          icon: Icons.layers,
+-          iconColor: Colors.teal,
++        _FadeSlideIn(
++          index: 4,
++          child: _SecondaryStatCard(
++            title: "Profit",
++            amount: "\$8,458,798",
++            percentage: "+35%",
++            icon: Icons.layers,
++            iconColor: Colors.teal,
++          ),
+         ),
+-        _SecondaryStatCard(
+-          title: "Invoice Due",
+-          amount: "\$48,988,78",
+-          percentage: "+35%",
+-          icon: Icons.pie_chart,
+-          iconColor: Colors.teal,
++        _FadeSlideIn(
++          index: 5,
++          child: _SecondaryStatCard(
++            title: "Invoice Due",
++            amount: "\$48,988,78",
++            percentage: "+35%",
++            icon: Icons.pie_chart,
++            iconColor: Colors.teal,
++          ),
+         ),
+-        _SecondaryStatCard(
+-          title: "Total Expenses",
+-          amount: "\$8,980,097",
+-          percentage: "+41%",
+-          icon: Icons.donut_large,
+-          iconColor: Colors.redAccent,
++        _FadeSlideIn(
++          index: 6,
++          child: _SecondaryStatCard(
++            title: "Total Expenses",
++            amount: "\$8,980,097",
++            percentage: "+41%",
++            icon: Icons.donut_large,
++            iconColor: Colors.redAccent,
++          ),
+         ),
+-        _SecondaryStatCard(
+-          title: "Total Payment Returns",
+-          amount: "\$78,458,798",
+-          percentage: "-20%",
+-          isPositive: false,
+-          icon: Icons.grid_view,
+-          iconColor: Colors.deepPurple,
++        _FadeSlideIn(
++          index: 7,
++          child: _SecondaryStatCard(
++            title: "Total Payment Returns",
++            amount: "\$78,458,798",
++            percentage: "-20%",
++            isPositive: false,
++            icon: Icons.grid_view,
++            iconColor: Colors.deepPurple,
++          ),
+         ),
+       ],
+     );
+@@ -372,6 +419,56 @@ class _SecondaryStatCard extends StatelessWidget {
+   }
+ }
+ 
++/// Staggered fade + slide-up entrance, used to give the dashboard a bit of
++/// life on first load without pulling in an extra animation package.
++/// `index` controls the stagger delay (40ms apart).
++class _FadeSlideIn extends StatefulWidget {
++  final Widget child;
++  final int index;
++
++  const _FadeSlideIn({required this.child, this.index = 0});
++
++  @override
++  State<_FadeSlideIn> createState() => _FadeSlideInState();
++}
++
++class _FadeSlideInState extends State<_FadeSlideIn>
++    with SingleTickerProviderStateMixin {
++  late final AnimationController _controller;
++  late final Animation<double> _fade;
++  late final Animation<Offset> _slide;
++
++  @override
++  void initState() {
++    super.initState();
++    _controller = AnimationController(
++      vsync: this,
++      duration: const Duration(milliseconds: 420),
++    );
++    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
++    _slide = Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero)
++        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
++
++    Future.delayed(Duration(milliseconds: 40 * widget.index), () {
++      if (mounted) _controller.forward();
++    });
++  }
++
++  @override
++  void dispose() {
++    _controller.dispose();
++    super.dispose();
++  }
++
++  @override
++  Widget build(BuildContext context) {
++    return FadeTransition(
++      opacity: _fade,
++      child: SlideTransition(position: _slide, child: widget.child),
++    );
++  }
++}
++
+ class _PlaceholderCard extends StatelessWidget {
+   final String title;
+   const _PlaceholderCard(this.title);
+diff --git a/lib/features/shell/presentation/shell_screen.dart b/lib/features/shell/presentation/shell_screen.dart
+index e14c110..7d68dc1 100644
+--- a/lib/features/shell/presentation/shell_screen.dart
++++ b/lib/features/shell/presentation/shell_screen.dart
+@@ -1,9 +1,9 @@
+ import 'package:flutter/material.dart';
+ import 'package:flutter_riverpod/flutter_riverpod.dart';
++import 'package:go_router/go_router.dart';
+ 
+ import '../../../core/utils/responsive.dart';
+ import 'widgets/side_menu.dart';
+-import 'widgets/header.dart'; // import header because the original UI has a header on top, but the screenshot has it in the content area
+ 
+ final sidebarOpenProvider = StateProvider<bool>((ref) => true);
+ 
+@@ -18,8 +18,10 @@ class ShellScreen extends ConsumerWidget {
+     final isDesktop = Responsive.isDesktop(context);
+     final isTablet = Responsive.isTablet(context);
+ 
+-    // On mobile/tablet, the sidebar is usually a Drawer.
+-    // But we also want a collapsible sidebar on desktop.
++    // Used as the AnimatedSwitcher key so switching routes triggers a
++    // transition, without the sidebar/header re-animating.
++    final String location = GoRouterState.of(context).uri.path;
++
+     final double sidebarWidth = isSidebarOpen ? 250.0 : 80.0;
+ 
+     return Scaffold(
+@@ -30,13 +32,44 @@ class ShellScreen extends ConsumerWidget {
+           children: [
+             if (isDesktop || (isTablet && isSidebarOpen))
+               AnimatedContainer(
+-                duration: const Duration(milliseconds: 300),
+-                curve: Curves.easeInOut,
++                duration: const Duration(milliseconds: 260),
++                curve: Curves.easeOutCubic,
+                 width: sidebarWidth,
++                decoration: BoxDecoration(
++                  color: Theme.of(context).cardColor,
++                  border: Border(
++                    right: BorderSide(
++                      color: Theme.of(context).dividerColor.withOpacity(0.08),
++                    ),
++                  ),
++                ),
++                // AnimatedContainer + Expanded below both re-lay-out every
++                // animation frame, so the body content resizes in lockstep
++                // with the sidebar instead of just snapping to the new width.
+                 child: const SideMenu(),
+               ),
+             Expanded(
+-              child: child, // This will be DashboardScreen, SalesScreen, etc.
++              child: ClipRect(
++                child: AnimatedSwitcher(
++                  duration: const Duration(milliseconds: 220),
++                  switchInCurve: Curves.easeOut,
++                  switchOutCurve: Curves.easeIn,
++                  transitionBuilder: (widget, animation) {
++                    final slideIn = Tween<Offset>(
++                      begin: const Offset(0, 0.02),
++                      end: Offset.zero,
++                    ).animate(animation);
++                    return FadeTransition(
++                      opacity: animation,
++                      child: SlideTransition(position: slideIn, child: widget),
++                    );
++                  },
++                  child: KeyedSubtree(
++                    key: ValueKey(location),
++                    child: child,
++                  ),
++                ),
++              ),
+             ),
+           ],
+         ),
+diff --git a/lib/features/shell/presentation/widgets/header.dart b/lib/features/shell/presentation/widgets/header.dart
+index f375c70..5b0a4a5 100644
+--- a/lib/features/shell/presentation/widgets/header.dart
++++ b/lib/features/shell/presentation/widgets/header.dart
+@@ -23,23 +23,32 @@ class Header extends ConsumerWidget {
+       child: Row(
+         children: [
+           // Sidebar Toggle Button
+-          InkWell(
+-            onTap: () {
+-              if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
+-                ref.read(sidebarOpenProvider.notifier).state = !ref.read(sidebarOpenProvider);
+-              } else {
+-                Scaffold.of(context).openDrawer();
+-              }
+-            },
+-            child: Container(
+-              padding: const EdgeInsets.all(8),
+-              decoration: BoxDecoration(
+-                color: Theme.of(context).primaryColor,
+-                shape: BoxShape.circle,
++          Builder(builder: (context) {
++            final isSidebarOpen = ref.watch(sidebarOpenProvider);
++            return InkWell(
++              borderRadius: BorderRadius.circular(20),
++              onTap: () {
++                if (Responsive.isDesktop(context) || Responsive.isTablet(context)) {
++                  ref.read(sidebarOpenProvider.notifier).state = !ref.read(sidebarOpenProvider);
++                } else {
++                  Scaffold.of(context).openDrawer();
++                }
++              },
++              child: Container(
++                padding: const EdgeInsets.all(8),
++                decoration: BoxDecoration(
++                  color: Theme.of(context).primaryColor,
++                  shape: BoxShape.circle,
++                ),
++                child: AnimatedRotation(
++                  duration: const Duration(milliseconds: 220),
++                  curve: Curves.easeOut,
++                  turns: isSidebarOpen ? 0 : 0.5,
++                  child: const Icon(Icons.keyboard_double_arrow_right, color: Colors.white, size: 18),
++                ),
+               ),
+-              child: const Icon(Icons.keyboard_double_arrow_right, color: Colors.white, size: 18),
+-            ),
+-          ),
++            );
++          }),
+           const SizedBox(width: 16),
+           
+           // Search Field
+@@ -100,12 +109,12 @@ class Header extends ConsumerWidget {
+                 const SizedBox(width: 24),
+               ],
+ 
+-              // Icons Row
+-              _buildIconButton(Icons.language),
+-              _buildIconButton(Icons.fullscreen),
++              // Icons Row (trim clutter on mobile so it never overflows)
++              if (!Responsive.isMobile(context)) _buildIconButton(Icons.language),
++              if (!Responsive.isMobile(context)) _buildIconButton(Icons.fullscreen),
+               _buildBadgeIconButton(Icons.mail_outline, "1"),
+               _buildIconButton(Icons.notifications_none),
+-              _buildIconButton(Icons.settings_outlined),
++              if (!Responsive.isMobile(context)) _buildIconButton(Icons.settings_outlined),
+               
+               const SizedBox(width: 16),
+               const ProfileCard(),
+@@ -119,15 +128,18 @@ class Header extends ConsumerWidget {
+   Widget _buildIconButton(IconData icon) {
+     return Padding(
+       padding: const EdgeInsets.symmetric(horizontal: 4),
+-      child: InkWell(
+-        onTap: () {},
+-        child: Container(
+-          padding: const EdgeInsets.all(8),
+-          decoration: BoxDecoration(
+-            shape: BoxShape.circle,
+-            color: Colors.grey.withOpacity(0.1),
++      child: _HoverScale(
++        child: InkWell(
++          onTap: () {},
++          borderRadius: BorderRadius.circular(20),
++          child: Container(
++            padding: const EdgeInsets.all(8),
++            decoration: BoxDecoration(
++              shape: BoxShape.circle,
++              color: Colors.grey.withOpacity(0.1),
++            ),
++            child: Icon(icon, size: 20, color: Colors.grey[700]),
+           ),
+-          child: Icon(icon, size: 20, color: Colors.grey[700]),
+         ),
+       ),
+     );
+@@ -171,6 +183,35 @@ class Header extends ConsumerWidget {
+   }
+ }
+ 
++/// Subtle scale-up on hover (desktop/web only — touch devices simply ignore
++/// the mouse events), used to make header icon buttons feel more alive.
++class _HoverScale extends StatefulWidget {
++  final Widget child;
++  const _HoverScale({required this.child});
++
++  @override
++  State<_HoverScale> createState() => _HoverScaleState();
++}
++
++class _HoverScaleState extends State<_HoverScale> {
++  bool _hovering = false;
++
++  @override
++  Widget build(BuildContext context) {
++    return MouseRegion(
++      cursor: SystemMouseCursors.click,
++      onEnter: (_) => setState(() => _hovering = true),
++      onExit: (_) => setState(() => _hovering = false),
++      child: AnimatedScale(
++        scale: _hovering ? 1.1 : 1.0,
++        duration: const Duration(milliseconds: 140),
++        curve: Curves.easeOut,
++        child: widget.child,
++      ),
++    );
++  }
++}
++
+ class ProfileCard extends StatelessWidget {
+   const ProfileCard({
+     super.key,
+diff --git a/lib/features/shell/presentation/widgets/side_menu.dart b/lib/features/shell/presentation/widgets/side_menu.dart
+index 1a696f2..8d8488d 100644
+--- a/lib/features/shell/presentation/widgets/side_menu.dart
++++ b/lib/features/shell/presentation/widgets/side_menu.dart
+@@ -9,6 +9,13 @@ class SideMenu extends ConsumerWidget {
+     super.key,
+   });
+ 
++  void _navigate(BuildContext context, String route) {
++    if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
++      Scaffold.of(context).closeDrawer();
++    }
++    context.go(route);
++  }
++
+   @override
+   Widget build(BuildContext context, WidgetRef ref) {
+     final String location = GoRouterState.of(context).uri.path;
+@@ -19,46 +26,51 @@ class SideMenu extends ConsumerWidget {
+       child: ListView(
+         children: [
+           DrawerHeader(
+-            child: isSidebarOpen 
+-              ? Row(
+-                  children: [
+-                    const Icon(Icons.shopping_bag, color: Color(0xFF2A2D3E), size: 36), // Dummy logo
+-                    const SizedBox(width: 8),
+-                    Text(
+-                      "dreams", 
+-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+-                        fontWeight: FontWeight.bold,
+-                        color: const Color(0xFF1F385B),
+-                      )
++            child: AnimatedSwitcher(
++              duration: const Duration(milliseconds: 200),
++              child: isSidebarOpen
++                  ? Row(
++                      key: const ValueKey('logo-open'),
++                      children: [
++                        const Icon(Icons.shopping_bag,
++                            color: Color(0xFF2A2D3E), size: 36),
++                        const SizedBox(width: 8),
++                        Flexible(
++                          child: Text(
++                            "dreams",
++                            overflow: TextOverflow.ellipsis,
++                            style:
++                                Theme.of(context).textTheme.headlineSmall?.copyWith(
++                                      fontWeight: FontWeight.bold,
++                                      color: const Color(0xFF1F385B),
++                                    ),
++                          ),
++                        ),
++                      ],
++                    )
++                  : const Icon(
++                      Icons.shopping_bag,
++                      key: ValueKey('logo-closed'),
++                      color: Color(0xFF2A2D3E),
++                      size: 36,
+                     ),
+-                  ],
+-                )
+-              : const Icon(Icons.shopping_bag, color: Color(0xFF2A2D3E), size: 36),
+-          ),
+-          
+-          if (isSidebarOpen)
+-            Padding(
+-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+-              child: Text("Main", style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey)),
+             ),
+-            
++          ),
++
++          _SectionLabel(text: "Main", isOpen: isSidebarOpen),
++
+           DrawerListTile(
+             title: "Dashboard",
+             svgSrc: "assets/icons/menu_dashboard.svg",
+             isActive: location == '/dashboard',
+             isOpen: isSidebarOpen,
+-            press: () {
+-              if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
+-                Scaffold.of(context).closeDrawer();
+-              }
+-              context.go('/dashboard');
+-            },
++            press: () => _navigate(context, '/dashboard'),
+           ),
+-          
++
+           if (isSidebarOpen)
+             DrawerListTile(
+               title: "Admin Dashboard",
+-              svgSrc: "assets/icons/menu_dashboard.svg", // Same for now
++              svgSrc: "assets/icons/menu_dashboard.svg",
+               isActive: location == '/admin',
+               isOpen: isSidebarOpen,
+               isSubItem: true,
+@@ -70,62 +82,38 @@ class SideMenu extends ConsumerWidget {
+             svgSrc: "assets/icons/menu_tran.svg",
+             isActive: location.startsWith('/sales'),
+             isOpen: isSidebarOpen,
+-            press: () {
+-              if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
+-                Scaffold.of(context).closeDrawer();
+-              }
+-              context.go('/sales');
+-            },
++            press: () => _navigate(context, '/sales'),
+           ),
+-          
+-          if (isSidebarOpen)
+-            Padding(
+-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+-              child: Text("Inventory", style: Theme.of(context).textTheme.labelSmall?.copyWith(color: Colors.grey)),
+-            ),
++
++          _SectionLabel(text: "Inventory", isOpen: isSidebarOpen),
+ 
+           DrawerListTile(
+             title: "Products",
+             svgSrc: "assets/icons/menu_store.svg",
+             isActive: location.startsWith('/inventory'),
+             isOpen: isSidebarOpen,
+-            press: () {
+-              if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
+-                Scaffold.of(context).closeDrawer();
+-              }
+-              context.go('/inventory');
+-            },
++            press: () => _navigate(context, '/inventory'),
+           ),
+           DrawerListTile(
+             title: "Purchases",
+             svgSrc: "assets/icons/menu_task.svg",
+             isActive: location.startsWith('/purchases'),
+             isOpen: isSidebarOpen,
+-            press: () {
+-              if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
+-                Scaffold.of(context).closeDrawer();
+-              }
+-              context.go('/purchases/new');
+-            },
++            press: () => _navigate(context, '/purchases/new'),
+           ),
+           DrawerListTile(
+             title: "Reports",
+             svgSrc: "assets/icons/menu_doc.svg",
+             isActive: location.startsWith('/reports'),
+             isOpen: isSidebarOpen,
+-            press: () {
+-              if (Scaffold.of(context).hasDrawer && Scaffold.of(context).isDrawerOpen) {
+-                Scaffold.of(context).closeDrawer();
+-              }
+-              context.go('/reports');
+-            },
++            press: () => _navigate(context, '/reports'),
+           ),
+           DrawerListTile(
+             title: "Settings",
+             svgSrc: "assets/icons/menu_setting.svg",
+             isActive: location.startsWith('/settings'),
+             isOpen: isSidebarOpen,
+-            press: () {}, 
++            press: () {},
+           ),
+         ],
+       ),
+@@ -133,7 +121,37 @@ class SideMenu extends ConsumerWidget {
+   }
+ }
+ 
+-class DrawerListTile extends StatelessWidget {
++class _SectionLabel extends StatelessWidget {
++  final String text;
++  final bool isOpen;
++  const _SectionLabel({required this.text, required this.isOpen});
++
++  @override
++  Widget build(BuildContext context) {
++    return AnimatedSize(
++      duration: const Duration(milliseconds: 200),
++      curve: Curves.easeOut,
++      child: isOpen
++          ? Padding(
++              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
++              child: AnimatedOpacity(
++                duration: const Duration(milliseconds: 200),
++                opacity: isOpen ? 1 : 0,
++                child: Text(
++                  text,
++                  style: Theme.of(context)
++                      .textTheme
++                      .labelSmall
++                      ?.copyWith(color: Colors.grey, letterSpacing: 0.5),
++                ),
++              ),
++            )
++          : const SizedBox(height: 4, width: double.infinity),
++    );
++  }
++}
++
++class DrawerListTile extends StatefulWidget {
+   const DrawerListTile({
+     super.key,
+     required this.title,
+@@ -148,40 +166,101 @@ class DrawerListTile extends StatelessWidget {
+   final VoidCallback press;
+   final bool isActive, isOpen, isSubItem;
+ 
++  @override
++  State<DrawerListTile> createState() => _DrawerListTileState();
++}
++
++class _DrawerListTileState extends State<DrawerListTile> {
++  bool _hovering = false;
++
+   @override
+   Widget build(BuildContext context) {
+     final activeColor = Theme.of(context).primaryColor;
+-    final inactiveColor = Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.5) ?? Colors.white54;
+-    
++    final inactiveColor =
++        Theme.of(context).textTheme.bodyMedium?.color?.withOpacity(0.55) ??
++            Colors.white54;
++
++    final Color background = widget.isActive
++        ? activeColor.withOpacity(0.12)
++        : _hovering
++            ? activeColor.withOpacity(0.05)
++            : Colors.transparent;
++
+     return Padding(
+-      padding: EdgeInsets.symmetric(horizontal: isOpen ? 12.0 : 4.0, vertical: 4.0),
+-      child: ListTile(
+-        onTap: press,
+-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+-        horizontalTitleGap: 0.0,
+-        selected: isActive,
+-        selectedTileColor: activeColor.withOpacity(0.1),
+-        contentPadding: EdgeInsets.symmetric(horizontal: isOpen ? (isSubItem ? 32.0 : 16.0) : 16.0),
+-        leading: isSubItem 
+-          ? Icon(Icons.circle, size: 8, color: isActive ? activeColor : inactiveColor)
+-          : SvgPicture.asset(
+-              svgSrc,
+-              colorFilter: ColorFilter.mode(
+-                  isActive ? activeColor : inactiveColor,
+-                  BlendMode.srcIn),
+-              height: 16,
+-            ),
+-        title: isOpen 
+-          ? Padding(
+-              padding: const EdgeInsets.only(left: 16.0),
+-              child: Text(
+-                title,
+-                style: TextStyle(
+-                    color: isActive ? activeColor : inactiveColor,
+-                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal),
++      padding: EdgeInsets.symmetric(
++          horizontal: widget.isOpen ? 12.0 : 4.0, vertical: 3.0),
++      child: MouseRegion(
++        onEnter: (_) => setState(() => _hovering = true),
++        onExit: (_) => setState(() => _hovering = false),
++        cursor: SystemMouseCursors.click,
++        child: Material(
++          color: Colors.transparent,
++          child: InkWell(
++            onTap: widget.press,
++            borderRadius: BorderRadius.circular(8),
++            child: AnimatedContainer(
++              duration: const Duration(milliseconds: 180),
++              curve: Curves.easeOut,
++              decoration: BoxDecoration(
++                color: background,
++                borderRadius: BorderRadius.circular(8),
+               ),
+-            ) 
+-          : null,
++              padding: EdgeInsets.symmetric(
++                horizontal: widget.isOpen
++                    ? (widget.isSubItem ? 20.0 : 12.0)
++                    : 12.0,
++                vertical: 11.0,
++              ),
++              child: Row(
++                children: [
++                  // Sliding active-indicator bar
++                  AnimatedContainer(
++                    duration: const Duration(milliseconds: 180),
++                    width: 3,
++                    height: widget.isActive ? 18 : 0,
++                    margin: const EdgeInsets.only(right: 8),
++                    decoration: BoxDecoration(
++                      color: activeColor,
++                      borderRadius: BorderRadius.circular(4),
++                    ),
++                  ),
++                  widget.isSubItem
++                      ? Icon(Icons.circle,
++                          size: 8,
++                          color: widget.isActive ? activeColor : inactiveColor)
++                      : SvgPicture.asset(
++                          widget.svgSrc,
++                          colorFilter: ColorFilter.mode(
++                              widget.isActive ? activeColor : inactiveColor,
++                              BlendMode.srcIn),
++                          height: 16,
++                        ),
++                  if (widget.isOpen)
++                    Expanded(
++                      child: Padding(
++                        padding: const EdgeInsets.only(left: 14.0),
++                        child: AnimatedOpacity(
++                          duration: const Duration(milliseconds: 160),
++                          opacity: widget.isOpen ? 1 : 0,
++                          child: Text(
++                            widget.title,
++                            overflow: TextOverflow.ellipsis,
++                            style: TextStyle(
++                                color: widget.isActive
++                                    ? activeColor
++                                    : inactiveColor,
++                                fontWeight: widget.isActive
++                                    ? FontWeight.bold
++                                    : FontWeight.normal),
++                          ),
++                        ),
++                      ),
++                    ),
++                ],
++              ),
++            ),
++          ),
++        ),
+       ),
+     );
+   }
